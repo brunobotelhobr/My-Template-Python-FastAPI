@@ -1,12 +1,14 @@
 # My-Python-Template
 
 
-![Icon](https://brunobotelhobr.github.io/My-Template-Python/0.0.1/assets/logo.png)
+![Icon](https://brunobotelhobr.github.io/My-Template-Python-FastAPI/0.0.1/assets/logo.png)
 
-![GitHub Action CI](https://github.com/brunobotelhobr/My-Template-Python/actions/workflows/ci.yml/badge.svg?branch=main)
-![GitHub Action CodeQL](https://github.com/brunobotelhobr/My-Template-Python/actions/workflows/codeql.yml/badge.svg?branch=main)
-![GitHub Action Trivy](https://github.com/brunobotelhobr/My-Template-Python/actions/workflows/trivy.yml/badge.svg?branch=main)
+![GitHub Action CI](https://github.com/brunobotelhobr/My-Template-Python-FastAPI/actions/workflows/ci.yml/badge.svg?branch=main)
+![GitHub Action CodeQL](https://github.com/brunobotelhobr/My-Template-Python-FastAPI/actions/workflows/codeql.yml/badge.svg?branch=main)
+![GitHub Action Trivy](https://github.com/brunobotelhobr/My-Template-Python-FastAPI/actions/workflows/trivy.yml/badge.svg?branch=main)
+`````
 [![codecov](https://codecov.io/gh/brunobotelhobr/My-Template-Python/branch/main/graph/badge.svg?token=EPMON2XJW2)](https://codecov.io/gh/brunobotelhobr/My-Template-Python)
+````
 
 This is a template repository for Python projects. 
 It uses Poetry for dependency management and includes pre-configured tools such as Black, Flake8, mypy, Pylint, pytest, and others, for formatting, linting, testing, and documentation management. 

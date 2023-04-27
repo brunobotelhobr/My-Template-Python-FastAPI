@@ -25,7 +25,7 @@ repo_name: My-Python-Template
 repo_url: https://github.com/brunobotelhobr/My-Python-Template
 site_author: Bruno Botelho <bruno.botelho.br@gmail.com>
 site_description: ''
-site_name: app
+site_name: api
 site_url: https://brunobotelhobr.github.io/My-Python-Template/
 theme:
   custom_dir: docs/overwrites

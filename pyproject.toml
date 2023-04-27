@@ -1,22 +1,27 @@
 [tool.poetry]
-name = "app"
+name = "api"
 version = "0.0.1"
 license = "MIT"
 description = ""
 authors = ["Bruno Botelho <bruno.botelho.br@gmail.com>"]
 maintainers = ["Bruno Botelho <bruno.botelho.br@gmail.com>"]
 readme = "README.md"
-packages = [{include = "app", from = "src"}]
-repository = "https://github.com/brunobotelhobr/My-Python-Template"
+packages = [{include = "api", from = "src"}]
+repository = "https://github.com/brunobotelhobr/My-Python-Template-FastAPI"
 homepage = "https://brunobotelhobr.github.io/My-Python-Template/"
 keywords = ["python"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-typer = {version = "^0.7.0", extras = ["rich"]}
-importlib-metadata = "^6.6.0"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+toml = "^0.10.2"
+sqlalchemy = "^2.0.10"
+pydantic = {extras = ["email"], version = "^1.10.7"}
+
 
 [tool.poetry.group.dev.dependencies]
+flake8-pyproject = "^1.2.3"
 black = "^23.3.0"
 isort = "^5.12.0"
 flake8 = "^6.0.0"
@@ -46,11 +51,11 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line_length = 79
+line_length = 120
 ignore = "E203"
 
 [tool.isort]
-line_length = 79
+line_length = 120
 atomic = true
 profile = "black"
 skip_gitignore = true
@@ -59,8 +64,8 @@ skip_gitignore = true
 check = true
 
 [tool.flake8]
-max-line-length = 79
-ignore = []
+max-line-length = 120
+ignore = ["B008"]
 per-file-ignores = []
 count = true
 
@@ -69,7 +74,7 @@ warn_return_any = true
 ignore_missing_imports = true
 
 [tool.pylint]
-max-line-length = 79
+max-line-length = 120
 [tool.pylint.BASIC]
 good-names = ["a", "b", "c", "i", "k", "k"]
 [tool.pylint.'MESSAGES CONTROL']
@@ -88,12 +93,13 @@ addopts = "--cov --cov-report term-missing"
 [tool.taskipy.variables]
 src_dir = "src"
 docs_branch = "documentation"
-package_dir = { var = "{src_dir}/app", recursive = true }
-package_name = "app"
+package_dir = { var = "{src_dir}/api/", recursive = true }
+package_name = "api"
 package_version = "0.0.1"
 docker_context = "brunobotelhobr"
 
 [tool.taskipy.tasks]
+run = { cmd = "uvicorn {package_name}.main:app --reload", help = "Run application" }
 pre-commit = { cmd = "task format && task lint && task tests", help = "Run all pre-commit tasks" }
 pre-release = { cmd = "task pre-commit && task bom && task req &&  task sec", help = "Run all pre-release tasks" }
 ----------- = "----------------------------------------"
@@ -101,8 +107,8 @@ info = { cmd = "poetry env info && poetry check && poetry show", help = "Show pr
 meta = { cmd = "python scripts/update-project-properties.py", help = "Update project properties" }
 upgrade = { cmd = "poetry self update && poetry update && task bom && task req", help = "Upgrade all dependencies" }
 sec = { cmd = "trivy fs --exit-code 1 --scanners vuln,config,secret . && bandit -c pyproject.toml -r src && horusec start -p ./src", help = "Run all security checks" }
-format = { cmd = "isort --settings-path pyproject.toml src && isort --settings-path pyproject.toml tests && black --config ./pyproject.toml src && black --config ./pyproject.toml tests && autoflake --recursive src && autoflake --recursive tests", help = "Run all formaters" }
-lint = { cmd = "flake8 --config pyproject.toml src && flake8 --config pyproject.toml tests && mypy --config-file pyproject.toml src && mypy --config-file pyproject.toml tests && pylint --rcfile pyproject.toml src && pylint --rcfile pyproject.toml tests", help = "Run all linters" }
+format = { cmd = "echo 'Running IsSort' && isort --settings-path pyproject.toml src && isort --settings-path pyproject.toml tests && echo 'Running Black' && black --config ./pyproject.toml src && black --config ./pyproject.toml tests  && echo 'Running Autoflake' && autoflake --recursive src && autoflake --recursive tests", help = "Run all formaters" }
+lint = { cmd = "echo 'Running Flake' && flake8 --toml-config pyproject.toml src && flake8 --toml-config pyproject.toml tests && echo 'Running MyPy' && mypy --config-file pyproject.toml src && mypy --config-file pyproject.toml tests && echo 'Running PyLint' &&  pylint --rcfile pyproject.toml src && pylint --rcfile pyproject.toml tests", help = "Run all linters" }
 bom = { cmd = "cyclonedx-py -p --format xml -F -o meta/bom/bom.xml && cyclonedx-py -p --format json -F -o meta/bom/bom.json", help = "Generate BOM" }
 req = { cmd = "poetry export --format requirements.txt > meta/requirements/requirements.txt && echo '-r requirements.txt' > meta/requirements/requirements-dev.txt && poetry export --with dev --format requirements.txt >> meta/requirements/requirements-dev.txt", help = "Generate requirements.txt" }
 test = { cmd = "pytest --cov={package_dir} --cov-report term-missing", help = "Run all tests" }
@@ -122,6 +128,6 @@ docs-delete = { cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type t
 docs-latest = { cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the version to set as latest:' && read DOCUMENTS_VERSION && mike set-default -b {docs_branch} $DOCUMENTS_VERSION && mike alias -b {docs_branch} -u $DOCUMENTS_VERSION latest && unset DOCUMENTS_VERSION", help = "Set the latest Version." }
 docs-purge = { cmd = "mike delete --all -b {docs_branch}", help = "Purge all versions of the docs." }
 docs-pub = { cmd = "python scripts/update-doc.py {docs_branch}", help = "Publish documentation to the doc branch on GitHub." }
-clear = { cmd = "rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site &&find . -type d -name __pycache__ > /dev/null", help = "Clean all generated files" }
+clean = { cmd = 'rm -rf database.db .mypy_cache && rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site && find . -type d -name __pycache__ | xargs rm -rf > /dev/null', help = "Clean all generated files" }
 
 
