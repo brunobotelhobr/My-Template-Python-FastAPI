@@ -75,9 +75,9 @@ ignore_missing_imports = true
 
 [tool.pylint]
 max-line-length = 120
+disable = ['E0611', 'R0903']
 [tool.pylint.BASIC]
-good-names = ["a", "b", "c", "i", "k", "k"]
-[tool.pylint.'MESSAGES CONTROL']
+good-names = ["a", "b", "c", "i", "k", "k", "l", "m", "n", "p", "v"]
 
 [tool.bandit]
 exclude_dirs = ["tests"]

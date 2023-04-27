@@ -3,7 +3,7 @@ FROM python:3.11-alpine
 # Update the system
 RUN apk update && apk upgrade
 # Create User
-RUN adduser -D -h /code -s /bin/bash app 
+RUN adduser -D -h /code -s /bin/bash api 
 
 # Install dependencies
 RUN pip install --upgrade pip
@@ -23,13 +23,15 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --without dev,docs
 
 # Adjust Permissions
-RUN chown -R app:app /code/*
+RUN chown -R api:api /code/*
 
-#Enable App User
-USER app
+#Enable Api User
+USER api
 
 HEALTHCHECK --interval=30s --timeout=3s \
-    CMD python /code/src/app/main.py version || exit 1
+    CMD python /code/src/api/main.py version || exit 1
+
+EXPOSE 8000
 
 # Define the entrypoint
-ENTRYPOINT ["python", "/code/src/app/main.py"]
+ENTRYPOINT ["python", "/code/src/api/main.py"]

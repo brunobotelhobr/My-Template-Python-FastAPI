@@ -3,7 +3,8 @@ import toml
 from fastapi import FastAPI
 
 from api.environment import db, env
-from api.users.router import router as users_router
+from api.users.router import router as user_router
+# from api.auth.route import router as auth_router
 
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
 app_version = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
@@ -45,4 +46,5 @@ def version() -> dict[str, str]:
     return {"version": app_version}
 
 
-app.include_router(users_router, prefix="/user", tags=["Users"])
+app.include_router(user_router, prefix="/users", tags=["Users"])
+# app.include_router(auth_router, prefix="/auth", tags=["Auth"])

@@ -128,3 +128,4 @@ dmypy.json
 src/.DS_Store
 poetry.lock
 .DS_Store
+database.db
