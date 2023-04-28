@@ -42,42 +42,28 @@ class UserIn(UserBase):
                     if i.isupper():
                         c = c + 1
                 if c < settings.users.password_policy.min_upper:
-                    raise ValueError(
-                        "must contain at least " +
-                        str(settings.users.password_policy.min_upper)
-                        + " upper case characters"
-                    )
+                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_upper) + " upper case characters")
             if settings.users.password_policy.min_lower > 0:
                 c = 0
                 for i in v:
                     if i.islower():
                         c = c + 1
                 if c < settings.users.password_policy.min_lower:
-                    raise ValueError(
-                        "must contain at least "
-                        + str(settings.users.password_policy.min_lower)
-                        + " lower case characters"
-                    )
+                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_lower) + " lower case characters")
             if settings.users.password_policy.min_digits > 0:
                 c = 0
                 for i in v:
                     if i.isdigit():
                         c = c + 1
                 if c < settings.users.password_policy.min_digits:
-                    raise ValueError(
-                        "must contain at least " + str(settings.users.password_policy.min_digits) + " digits"
-                    )
+                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_digits) + " digits")
             if settings.users.password_policy.min_special > 0:
                 c = 0
                 for i in v:
                     if not i.isalnum():
                         c = c + 1
                 if c < settings.users.password_policy.min_special:
-                    raise ValueError(
-                        "must contain at least "
-                        + str(settings.users.password_policy.min_special)
-                        + " special characters"
-                    )
+                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_special) + " special characters")
         return v
 
     class Config:
@@ -102,9 +88,7 @@ class UserDB(UserBase):
 
     key: str = Field(example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Key")
     salt: str = Field(example="12345678", title="Salt")
-    password_hash: str = Field(
-        example="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Password Hash"
-    )
+    password_hash: str = Field(example="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Password Hash")
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""

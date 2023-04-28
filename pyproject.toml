@@ -22,11 +22,11 @@ exclude_dirs = [ "tests",]
 skips = ["B104","B311"]
 
 [tool.black]
-line_length = 120
+line_length = 160
 ignore = "E203"
 
 [tool.isort]
-line_length = 120
+line_length = 160
 atomic = true
 profile = "black"
 skip_gitignore = true
@@ -35,7 +35,7 @@ skip_gitignore = true
 check = true
 
 [tool.flake8]
-max-line-length = 120
+max-line-length = 160
 ignore = [ "B008", "D100"]
 per-file-ignores = []
 count = true
@@ -45,7 +45,7 @@ warn_return_any = true
 ignore_missing_imports = true
 
 [tool.pylint]
-max-line-length = 120
+max-line-length = 160
 disable = [ "E0611", "R0903", "R0913", "C0114", "E1121"]
 
 [tool.poetry.dependencies]

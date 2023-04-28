@@ -80,9 +80,7 @@ class RandonGenerator:
         """
         # check if the sum of the numbers, special, uper and lower is less than the size of the password
         if (numbers + special + uper + lower) > size:
-            raise ValueError(
-                "The sum of the numbers, special, uper and lower must be less than the size of the password."
-            )
+            raise ValueError("The sum of the numbers, special, uper and lower must be less than the size of the password.")
         # check if the numbers, special, uper and lower are greater than or equal to zero
         if numbers < 0 or special < 0 or uper < 0 or lower < 0:
             raise ValueError("The numbers, special, uper and lower must be greater than or equal to zero.")
