@@ -43,8 +43,8 @@ class UserIn(UserBase):
                         c = c + 1
                 if c < settings.users.password_policy.min_upper:
                     raise ValueError(
-                        "must contain at least "
-                        + str(settings.users.password_policy.min_upper)
+                        "must contain at least " +
+                        str(settings.users.password_policy.min_upper)
                         + " upper case characters"
                     )
             if settings.users.password_policy.min_lower > 0:

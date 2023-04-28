@@ -20,4 +20,6 @@ session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class Base(DeclarativeBase):
+    """Base class for all the database models."""
+
     pass
