@@ -59,11 +59,9 @@ class RandonGenerator:
                 name = name + " "
         return name
 
-    def password(self, size: int = 12, numbers: int = 1, special: int = 1, uper: int = 1, lower=1) -> str:
-        """
-        Summary.
-
-            Return a random password.
+    def password(self, size: int = 12, numbers: int = 1, special: int = 1,
+                 uper: int = 1, lower=1) -> str:
+        """Return a random password.
 
         Args:
             size (int, optional): Size of password. Defaults to 12.

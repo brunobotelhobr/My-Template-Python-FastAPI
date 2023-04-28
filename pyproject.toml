@@ -46,7 +46,7 @@ ignore_missing_imports = true
 
 [tool.pylint]
 max-line-length = 120
-disable = [ "E0611", "R0903",]
+disable = [ "E0611", "R0903", "R0913"]
 
 [tool.poetry.dependencies]
 python = ">3.10,<3.12"
