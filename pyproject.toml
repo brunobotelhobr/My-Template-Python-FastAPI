@@ -192,7 +192,7 @@ cmd = "python scripts/update-doc.py {docs_branch}"
 help = "Publish documentation to the doc branch on GitHub."
 
 [tool.taskipy.tasks.clean]
-cmd = "rm -rf database.db .mypy_cache && rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site && find . -type d -name __pycache__ | xargs rm -rf > /dev/null"
+cmd = "rm poetry.lock && rm -rf database.db .mypy_cache && rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site && find . -type d -name __pycache__ | xargs rm -rf > /dev/null"
 help = "Clean all generated files"
 
 [tool.poetry.group.dev.dependencies]
