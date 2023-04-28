@@ -1,0 +1,7 @@
+LOGS,
+SALVAR Config
+auth
+LOGIN
+LOGOUT
+/mE 
+/PASSWORD RESET

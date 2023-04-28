@@ -1,6 +1,6 @@
 """Database connection and session management."""
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from api.environment import db, env
 
@@ -17,4 +17,7 @@ def create_local_engine():
 # Spawn the engine
 engine = create_local_engine()
 session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass

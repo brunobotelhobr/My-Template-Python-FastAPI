@@ -26,29 +26,29 @@ def user_save(database: Session, user: UserORM) -> UserORM:
     return user
 
 
-def user_delete(database: Session, key: str) -> UserORM:
-    """Delete user."""
-    user = user_get_by(database=database, attribute="key", value=key)
-    database.delete(user)
-    database.commit()
-    return user
+# def user_delete(database: Session, key: str) -> UserORM:
+#     """Delete user."""
+#     user = user_get_by(database=database, attribute="key", value=key)
+#     database.delete(user)
+#     database.commit()
+#     return user
 
 
-def user_get_by(database: Session, attribute: str, value: str) -> UserORM | None:
-    """Get a user by attribute."""
-    return database.query(UserORM).filter(getattr(UserORM, attribute) == value).first()
+# def user_get_by(database: Session, attribute: str, value: str) -> UserORM | None:
+#     """Get a user by attribute."""
+#     return database.query(UserORM).filter(getattr(UserORM, attribute) == value).first()
 
 
-def user_update(database: Session, user: UserORM, update_dict: dict) -> UserORM:
-    """Update user."""
-    recod = database.query(UserORM).filter(UserORM.key == user.key).first()
-    if recod is None:
-        raise HTTPException(status_code=404, detail="Item not found")
+# def user_update(database: Session, user: UserORM, update_dict: dict) -> UserORM:
+#     """Update user."""
+#     recod = database.query(UserORM).filter(UserORM.key == user.key).first()
+#     if recod is None:
+#         raise HTTPException(status_code=404, detail="Item not found")
 
-    # Update record with user data
-    for field, value in update_dict.items():
-        setattr(user, field, value)
-    user.changed_at = datetime.now()
-    database.commit()
-    database.refresh(user)
-    return user
+#     # Update record with user data
+#     for field, value in update_dict.items():
+#         setattr(user, field, value)
+#     user.changed_at = datetime.now()
+#     database.commit()
+#     database.refresh(user)
+#     return user

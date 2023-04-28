@@ -1,27 +1,29 @@
+"""script to update documentation."""
 import argparse  # type: ignore
 import os  # type: ignore
 
+# Print Banner
 print("----------------------------------------------------------------")
 print("Updating Documentation, point github sites to the correct branch")
 print("----------------------------------------------------------------")
 
-# Get the tirst argument
+# Get the branch argument
 parser = argparse.ArgumentParser()
 parser.add_argument("branch", help="The doucmentation branch")
 args = parser.parse_args()
 
-DOC_BRANCH = args.branch
+doc_branch = args.branch
 
 # Run a command and get the output as a string
 
-CURRENT_BRANCH = os.popen("git rev-parse --abbrev-ref HEAD").read()
-print("Current Branch: " + CURRENT_BRANCH)
-print("Documentation Branch: " + DOC_BRANCH)
+current_branch = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
+print("Current Branch: " + current_branch)
+print("Documentation Branch: " + doc_branch)
 
-os.system("git checkout " + DOC_BRANCH + " > /dev/null")
-print("Current Branch: " + DOC_BRANCH)
+os.system("git checkout " + doc_branch + " > /dev/null")
+print("Current Branch: " + doc_branch)
 
 os.system("git add * > /dev/null")
 os.system("git commit -m 'Task: Update Documentation' > /dev/null")
-os.system("git push --set-upstream origin " + DOC_BRANCH)
-os.system("git checkout " + CURRENT_BRANCH + "  > /dev/null")
+os.system("git push --set-upstream origin " + doc_branch)
+os.system("git checkout " + current_branch + "  > /dev/null")

@@ -1,54 +1,25 @@
+[build-system]
+requires = [ "poetry-core",]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "api"
 version = "0.0.1"
 license = "MIT"
 description = ""
-authors = ["Bruno Botelho <bruno.botelho.br@gmail.com>"]
-maintainers = ["Bruno Botelho <bruno.botelho.br@gmail.com>"]
+authors = [ "Bruno Botelho <bruno.botelho.br@gmail.com>",]
+maintainers = [ "Bruno Botelho <bruno.botelho.br@gmail.com>",]
 readme = "README.md"
-packages = [{include = "api", from = "src"}]
 repository = "https://github.com/brunobotelhobr/My-Python-Template-FastAPI"
-homepage = "https://brunobotelhobr.github.io/My-Python-Template/"
-keywords = ["python"]
+homepage = "https://brunobotelhobr.github.io/My-Python-Template-FastAPI/"
+keywords = [ "python",]
+[[tool.poetry.packages]]
+include = "api"
+from = "src"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-fastapi = "^0.95.1"
-uvicorn = "^0.21.1"
-toml = "^0.10.2"
-sqlalchemy = "^2.0.10"
-pydantic = {extras = ["email"], version = "^1.10.7"}
-
-
-[tool.poetry.group.dev.dependencies]
-flake8-pyproject = "^1.2.3"
-black = "^23.3.0"
-isort = "^5.12.0"
-flake8 = "^6.0.0"
-pylint = "^2.17.2"
-pyflakes = "^3.0.1"
-mypy = "^1.2.0"
-autoflake = "^2.1.0"
-pytest = "^7.3.1"
-cyclonedx-bom = "^3.11.0"
-pytest-cov = "^4.0.0"
-bandit = {version = "^1.7.5", extras = ["toml"]}
-flake8-bugbear = "^23.3.23"
-flake8-docstrings = "^1.7.0"
-flake8-tidy-imports = "^4.8.0"
-taskipy = "^1.10.4"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-material = "^9.1.6"
-mkdocs = "^1.4.2"
-mkdocs-material-extensions = "^1.1.1"
-pymdown-extensions = "^9.11"
-mkdocstrings = {version = "^0.21.2", extras = ["python"]}
-mike = "^1.1.2"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.bandit]
+exclude_dirs = [ "tests",]
+skips = ["B104","B311"]
 
 [tool.black]
 line_length = 120
@@ -65,7 +36,7 @@ check = true
 
 [tool.flake8]
 max-line-length = 120
-ignore = ["B008"]
+ignore = [ "B008",]
 per-file-ignores = []
 count = true
 
@@ -75,59 +46,183 @@ ignore_missing_imports = true
 
 [tool.pylint]
 max-line-length = 120
-disable = ['E0611', 'R0903']
-[tool.pylint.BASIC]
-good-names = ["a", "b", "c", "i", "k", "k", "l", "m", "n", "p", "v"]
+disable = [ "E0611", "R0903",]
 
-[tool.bandit]
-exclude_dirs = ["tests"]
-tests = []
-skips = []
+[tool.poetry.dependencies]
+python = ">3.10,<3.12"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+toml = "^0.10.2"
+sqlalchemy = "^2.0.10"
+
+[tool.pylint.BASIC]
+good-names = [ "a", "b", "c", "i", "k", "k", "l", "m", "n", "p", "v",]
 
 [tool.taskipy.settings]
 use_vars = true
 
+[tool.taskipy.variables]
+src-dir = "src"
+name = "api"
+version = "0.0.1"
+docs-branch = "documentation"
+docker-context = "brunobotelhobr"
+
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing"
 
-[tool.taskipy.variables]
-src_dir = "src"
-docs_branch = "documentation"
-package_dir = { var = "{src_dir}/api/", recursive = true }
-package_name = "api"
-package_version = "0.0.1"
-docker_context = "brunobotelhobr"
+[tool.poetry.dependencies.pydantic]
+extras = [ "email",]
+version = "^1.10.7"
 
-[tool.taskipy.tasks]
-run = { cmd = "uvicorn {package_name}.main:app --reload", help = "Run application" }
-pre-commit = { cmd = "task format && task lint && task tests", help = "Run all pre-commit tasks" }
-pre-release = { cmd = "task pre-commit && task bom && task req &&  task sec", help = "Run all pre-release tasks" }
------------ = "----------------------------------------"
-info = { cmd = "poetry env info && poetry check && poetry show", help = "Show project info" }
-meta = { cmd = "python scripts/update-project-properties.py", help = "Update project properties" }
-upgrade = { cmd = "poetry self update && poetry update && task bom && task req", help = "Upgrade all dependencies" }
-sec = { cmd = "trivy fs --exit-code 1 --scanners vuln,config,secret . && bandit -c pyproject.toml -r src && horusec start -p ./src", help = "Run all security checks" }
-format = { cmd = "echo 'Running IsSort' && isort --settings-path pyproject.toml src && isort --settings-path pyproject.toml tests && echo 'Running Black' && black --config ./pyproject.toml src && black --config ./pyproject.toml tests  && echo 'Running Autoflake' && autoflake --recursive src && autoflake --recursive tests", help = "Run all formaters" }
-lint = { cmd = "echo 'Running Flake' && flake8 --toml-config pyproject.toml src && flake8 --toml-config pyproject.toml tests && echo 'Running MyPy' && mypy --config-file pyproject.toml src && mypy --config-file pyproject.toml tests && echo 'Running PyLint' &&  pylint --rcfile pyproject.toml src && pylint --rcfile pyproject.toml tests", help = "Run all linters" }
-bom = { cmd = "cyclonedx-py -p --format xml -F -o meta/bom/bom.xml && cyclonedx-py -p --format json -F -o meta/bom/bom.json", help = "Generate BOM" }
-req = { cmd = "poetry export --format requirements.txt > meta/requirements/requirements.txt && echo '-r requirements.txt' > meta/requirements/requirements-dev.txt && poetry export --with dev --format requirements.txt >> meta/requirements/requirements-dev.txt", help = "Generate requirements.txt" }
-test = { cmd = "pytest --cov={package_dir} --cov-report term-missing", help = "Run all tests" }
-pypi-build = { cmd = "poetry build", help = "Build package for PyPI" }
-pypi-auth = { cmd = "echo 'Type PyPI API token:' && read -s PYPI_TOKEN && poetry config pypi-token.pypi $PYPI_TOKEN && unset PYPI_TOKEN", help = "Authenticate to PyPI"}
-pypi-pub = { cmd = "poetry publish", help = "Publish package to PyPI" }
-docker-list = { cmd = "echo 'Local docker image versions: ' && docker images {docker_context}/{package_name}", help = "List docker images" }
-docker-build = { cmd = "task docker-list && echo 'Type the tag to build:' && read APP_DV && docker build -t {docker_context}/{package_name}:$APP_DV . && unset APP_DV", help = "Build docker image" }
-docker-sec-scan = { cmd = "task docker-list && echo 'Type the tag to scan:' && read APP_DV && trivy image {docker_context}/{package_name}:$APP_DV . && unset APP_DV", help = "Scan a docker image looking for vulenrabilities" }
-docker-auth = { cmd = "docker login", help = "Authenticate to Docker Hub"}
-docker-latest = { cmd = "task docker-list && echo 'Type the tag to tag as latest:' && read APP_DV && docker tag {docker_context}/{package_name}:$APP_DV {docker_context}/{package_name}:latest && unset APP_DV", help = "Tag a docker image as latest" }
-docker-pub = { cmd = "task docker-list && echo 'Type the tag to build:' && read -s APP_DV && docker push {docker_context}/{package_name}:$APP_DV && unset APP_DV", help = "Publish docker image to Docker Hub" }
-docs = { cmd = "mike serve -b {docs_branch}", help = "Run docs server" }
-docs-list = { cmd = "mike list -b {docs_branch}", help = "List docs versions" }
-docs-build = { cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the new version to create:' && read DOCUMENTS_VERSION && mike deploy -b {docs_branch} $DOCUMENTS_VERSION", help = "Add a new version to docs" }
-docs-delete = { cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the version to delete:' && read DOCUMENTS_VERSION && mike delete -b {docs_branch} $DOCUMENTS_VERSION && unset DOCUMENTS_VERSION", help = "Delete a version of the docs" }
-docs-latest = { cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the version to set as latest:' && read DOCUMENTS_VERSION && mike set-default -b {docs_branch} $DOCUMENTS_VERSION && mike alias -b {docs_branch} -u $DOCUMENTS_VERSION latest && unset DOCUMENTS_VERSION", help = "Set the latest Version." }
-docs-purge = { cmd = "mike delete --all -b {docs_branch}", help = "Purge all versions of the docs." }
-docs-pub = { cmd = "python scripts/update-doc.py {docs_branch}", help = "Publish documentation to the doc branch on GitHub." }
-clean = { cmd = 'rm -rf database.db .mypy_cache && rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site && find . -type d -name __pycache__ | xargs rm -rf > /dev/null', help = "Clean all generated files" }
+[tool.taskipy.variables.package-dir]
+var = "{src-dir}/api/"
+recursive = true
 
+[tool.taskipy.tasks.run]
+cmd = "uvicorn {name}.main:app --reload"
+help = "Run application"
 
+[tool.taskipy.tasks.pre-commit]
+cmd = "task format && task lint && task tests"
+help = "Run all pre-commit tasks"
+
+[tool.taskipy.tasks.pre-release]
+cmd = "task pre-commit && task bom && task req &&  task sec"
+help = "Run all pre-release tasks"
+
+[tool.taskipy.tasks.info]
+cmd = "poetry env info && poetry check && poetry show"
+help = "Show project info"
+
+[tool.taskipy.tasks.meta]
+cmd = "python scripts/update_project_properties.py"
+help = "Update project properties"
+
+[tool.taskipy.tasks.upgrade]
+cmd = "poetry self update && poetry update && task bom && task req"
+help = "Upgrade all dependencies"
+
+[tool.taskipy.tasks.sec]
+cmd = "trivy fs --exit-code 1 --scanners vuln,config,secret . && bandit -c pyproject.toml -r src && horusec start --disable-docker -p ./src"
+help = "Run all security checks"
+
+[tool.taskipy.tasks.format]
+cmd = "echo 'Running IsSort' && isort --settings-path pyproject.toml src && isort --settings-path pyproject.toml tests && echo 'Running Black' && black --config ./pyproject.toml src && black --config ./pyproject.toml tests  && echo 'Running Autoflake' && autoflake --recursive src && autoflake --recursive tests"
+help = "Run all formaters"
+
+[tool.taskipy.tasks.lint]
+cmd = "echo 'Running Flake' && flake8 --toml-config pyproject.toml src && flake8 --toml-config pyproject.toml tests && echo 'Running MyPy' && mypy --config-file pyproject.toml src && mypy --config-file pyproject.toml tests && echo 'Running PyLint' &&  pylint --rcfile pyproject.toml src && pylint --rcfile pyproject.toml tests"
+help = "Run all linters"
+
+[tool.taskipy.tasks.bom]
+cmd = "cyclonedx-py -p --format xml -F -o meta/bom/bom.xml && cyclonedx-py -p --format json -F -o meta/bom/bom.json"
+help = "Generate BOM"
+
+[tool.taskipy.tasks.req]
+cmd = "poetry export --format requirements.txt > meta/requirements/requirements.txt && echo '-r requirements.txt' > meta/requirements/requirements-dev.txt && poetry export --with dev --format requirements.txt >> meta/requirements/requirements-dev.txt"
+help = "Generate requirements.txt"
+
+[tool.taskipy.tasks.test]
+cmd = "pytest --cov={package-dir} --cov-report term-missing"
+help = "Run all tests"
+
+[tool.taskipy.tasks.pypi-build]
+cmd = "poetry build"
+help = "Build package for PyPI"
+
+[tool.taskipy.tasks.pypi-auth]
+cmd = "echo 'Type PyPI API token:' && read -s PYPI_TOKEN && poetry config pypi-token.pypi $PYPI_TOKEN && unset PYPI_TOKEN"
+help = "Authenticate to PyPI"
+
+[tool.taskipy.tasks.pypi-pub]
+cmd = "poetry publish"
+help = "Publish package to PyPI"
+
+[tool.taskipy.tasks.docker-list]
+cmd = "echo 'Local docker image versions: ' && docker images {docker_context}/{package_name}"
+help = "List docker images"
+
+[tool.taskipy.tasks.docker-build]
+cmd = "task docker-list && echo 'Type the tag to build:' && read APP_DV && docker build -t {docker_context}/{package_name}:$APP_DV . && unset APP_DV"
+help = "Build docker image"
+
+[tool.taskipy.tasks.docker-sec-scan]
+cmd = "task docker-list && echo 'Type the tag to scan:' && read APP_DV && trivy image {docker_context}/{package_name}:$APP_DV . && unset APP_DV"
+help = "Scan a docker image looking for vulenrabilities"
+
+[tool.taskipy.tasks.docker-auth]
+cmd = "docker login"
+help = "Authenticate to Docker Hub"
+
+[tool.taskipy.tasks.docker-latest]
+cmd = "task docker-list && echo 'Type the tag to tag as latest:' && read APP_DV && docker tag {docker_context}/{package_name}:$APP_DV {docker_context}/{package_name}:latest && unset APP_DV"
+help = "Tag a docker image as latest"
+
+[tool.taskipy.tasks.docker-pub]
+cmd = "task docker-list && echo 'Type the tag to build:' && read -s APP_DV && docker push {docker_context}/{package_name}:$APP_DV && unset APP_DV"
+help = "Publish docker image to Docker Hub"
+
+[tool.taskipy.tasks.docs]
+cmd = "mike serve -b {docs_branch}"
+help = "Run docs server"
+
+[tool.taskipy.tasks.docs-list]
+cmd = "mike list -b {docs_branch}"
+help = "List docs versions"
+
+[tool.taskipy.tasks.docs-build]
+cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the new version to create:' && read DOCUMENTS_VERSION && mike deploy -b {docs_branch} $DOCUMENTS_VERSION"
+help = "Add a new version to docs"
+
+[tool.taskipy.tasks.docs-delete]
+cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the version to delete:' && read DOCUMENTS_VERSION && mike delete -b {docs_branch} $DOCUMENTS_VERSION && unset DOCUMENTS_VERSION"
+help = "Delete a version of the docs"
+
+[tool.taskipy.tasks.docs-latest]
+cmd = "echo 'Acutal versions: '&& task docs-list && echo 'Type the version to set as latest:' && read DOCUMENTS_VERSION && mike set-default -b {docs_branch} $DOCUMENTS_VERSION && mike alias -b {docs_branch} -u $DOCUMENTS_VERSION latest && unset DOCUMENTS_VERSION"
+help = "Set the latest Version."
+
+[tool.taskipy.tasks.docs-purge]
+cmd = "mike delete --all -b {docs_branch}"
+help = "Purge all versions of the docs."
+
+[tool.taskipy.tasks.docs-pub]
+cmd = "python scripts/update-doc.py {docs_branch}"
+help = "Publish documentation to the doc branch on GitHub."
+
+[tool.taskipy.tasks.clean]
+cmd = "rm -rf database.db .mypy_cache && rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site && find . -type d -name __pycache__ | xargs rm -rf > /dev/null"
+help = "Clean all generated files"
+
+[tool.poetry.group.dev.dependencies]
+flake8-pyproject = "^1.2.3"
+black = "^23.3.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+pylint = "^2.17.2"
+pyflakes = "^3.0.1"
+mypy = "^1.2.0"
+autoflake = "^2.1.0"
+pytest = "^7.3.1"
+cyclonedx-bom = "^3.11.0"
+pytest-cov = "^4.0.0"
+flake8-bugbear = "^23.3.23"
+flake8-docstrings = "^1.7.0"
+flake8-tidy-imports = "^4.8.0"
+taskipy = "^1.10.4"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "^9.1.6"
+mkdocs = "^1.4.2"
+mkdocs-material-extensions = "^1.1.1"
+pymdown-extensions = "^9.11"
+mike = "^1.1.2"
+
+[tool.poetry.group.dev.dependencies.bandit]
+version = "^1.7.5"
+extras = [ "toml",]
+
+[tool.poetry.group.docs.dependencies.mkdocstrings]
+version = "^0.21.2"
+extras = [ "python",]

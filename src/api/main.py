@@ -4,7 +4,6 @@ from fastapi import FastAPI
 
 from api.environment import db, env
 from api.users.router import router as user_router
-# from api.auth.route import router as auth_router
 
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
 app_version = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
@@ -47,4 +46,8 @@ def version() -> dict[str, str]:
 
 
 app.include_router(user_router, prefix="/users", tags=["Users"])
-# app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

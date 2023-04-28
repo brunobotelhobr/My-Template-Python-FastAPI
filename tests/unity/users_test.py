@@ -1,24 +1,25 @@
 """Test the main module."""
 from pytest import raises
 
+from api.users import settings
 from api.utils import generator
-from src.api.users import config, crud, model, router, schema
+from src.api.users import crud, model, router, schema
 
 
 def test_config_user() -> None:
     """Test config."""
-    c = config.UserConfig()
+    c = settings.UserConfig()
     # check if is bool
     assert isinstance(c.allow_delete, bool)
     assert isinstance(c.default_active, bool)
     assert isinstance(c.default_blocked, bool)
     assert isinstance(c.default_verified, bool)
-    assert isinstance(c.password_policy, config.PasswordPolicy)
+    assert isinstance(c.password_policy, settings.PasswordPolicy)
 
 
 def test_config_user_password_policy():
     """Test password policy."""
-    p = config.PasswordPolicy()
+    p = settings.PasswordPolicy()
     assert isinstance(p.active, bool)
     assert isinstance(p.min_length, int)
     assert isinstance(p.max_length, int)
