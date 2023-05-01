@@ -47,9 +47,15 @@ class SettingsModel(BaseModel):
         with Session(engine) as session:
             s = session.query(SettingsORM).filter(SettingsORM.name == self.name).first()
             if s:
-                self.__dict__.update(json.loads(str(s.data)))
-                return True
-            return self.save()
+                loaded = json.loads(str(s.data))
+                for key, value in loaded.items():
+                    if hasattr(self, key):
+                        orm_model = self.__fields__[key].type_
+                        if issubclass(orm_model, BaseModel):
+                            setattr(self, key, orm_model(**value))
+                        else:
+                            setattr(self, key, value)
+            return True
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""

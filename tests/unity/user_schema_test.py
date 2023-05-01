@@ -40,7 +40,7 @@ def test_user_out():
         active=True,
         verified=True,
         blocked=False,
-        password_setiing_date=creation_date,
+        password_setting_date=creation_date,
         password_attempts_count=0,
         need_password_change=False,
     )  # type: ignore
@@ -64,7 +64,7 @@ def test_user_db():
         active=True,
         verified=True,
         blocked=False,
-        password_setiing_date=creation_date,
+        password_setting_date=creation_date,
         password_attempts_count=0,
         need_password_change=False,
     )
@@ -112,10 +112,12 @@ def test_user_password():  # type: ignore
     with pytest.raises(ValidationError):
         UserIn(name=generator.name(), email=generator.email(), password="a")  # type: ignore
 
+
 def test_user_name():
     """Test name validation."""
     with pytest.raises(ValidationError):
         UserIn(name="A", email=generator.email(), password=generator.password())  # type: ignore
+
 
 def test_user_email():
     """Test email validation."""

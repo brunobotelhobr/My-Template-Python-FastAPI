@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from src.api.main import app
 import re
-import toml
+import toml  # type: ignore
 client = TestClient(app)
 
 

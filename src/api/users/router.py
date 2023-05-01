@@ -47,17 +47,13 @@ def create_user(user_in: UserIn, database: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Email already exists in the system")
     # Generate calculated fields.
     key = generator.uuid()
-    salt = generator.uuid()
+    salt = generator.salt()
     password_hash = generator.hasher(password=user_in.password, salt=salt)
     # Validate Model
     user_db = UserDB(**user_in.dict(), salt=salt, password_hash=password_hash, key=key)
-    # Setting default values.
-    user_db.active = settings.users.default_active
-    user_db.verified = settings.users.default_verified
-    user_db.need_password_change = settings.users.default_needs_password_chage
-    user_db.password_setiing_date = generator.now()
     # Convert to ORM and save.
-    user_db = UserORM(**user_db.dict(exclude_unset=True))  # type: ignore
+    print(user_db.dict())
+    user_db = UserORM(**user_db.dict())  # type: ignore
     database.add(user_db)
     database.commit()
     return user_db

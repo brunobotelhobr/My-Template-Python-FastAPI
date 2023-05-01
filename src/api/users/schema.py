@@ -4,6 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, validator
 
 from api.settings.router import settings
+from api.utils import generator
 
 
 class UserBase(BaseModel):
@@ -87,7 +88,7 @@ class UserOut(UserBase):
     verified: bool = Field(example=False, title="Verified")
     need_password_change: bool = Field(example=False, title="Need Password Change")
     password_attempts_count: int = Field(example=0, title="Password Strickes")
-    password_setiing_date: datetime = Field(example="2021-01-01 00:00:00", title="Password Setting Date")
+    password_setting_date: datetime = Field(example="2021-01-01 00:00:00", title="Password Setting Date")
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
@@ -98,15 +99,15 @@ class UserOut(UserBase):
 class UserDB(UserBase):
     """User database model."""
 
-    key: str = Field(example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Key")
-    salt: str = Field(example="12345678", title="Salt")
-    active: bool = Field(example=True, title="Active")
-    blocked: bool = Field(example=False, title="Blocked")
-    verified: bool = Field(example=False, title="Verified")
-    need_password_change: bool = Field(example=False, title="Need Password Change")
-    password_attempts_count: int = Field(example=0, title="Password Strickes")
+    key: str = Field(default=generator.uuid(), example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Key")
+    salt: str = Field(default=generator.salt(), example="12345678", title="Salt")
+    active: bool = Field(default=settings.users.default_active, example=True, title="Active")
+    blocked: bool = Field(default=settings.users.default_blocked, example=False, title="Blocked")
+    verified: bool = Field(default=settings.users.default_verified, example=False, title="Verified")
+    need_password_change: bool = Field(default=settings.users.default_needs_password_change, example=False, title="Need Password Change")
+    password_attempts_count: int = Field(default=0, example=0, title="Password Strickes")
     password_hash: str = Field(example="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Password Hash")
-    password_setiing_date: datetime = Field(example="2021-01-01 00:00:00", title="Password Setting Date")
+    password_setting_date: datetime = Field(default=generator.now(), example="2021-01-01 00:00:00", title="Password Setting Date")
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""

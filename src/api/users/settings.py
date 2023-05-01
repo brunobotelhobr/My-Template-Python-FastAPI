@@ -69,7 +69,7 @@ class SettingsUser(BaseModel):
         default=True,
     )
     default_blocked: bool = Field(title="Default user blocked status", description="If enabled, users will be created as blocked.", default=False)
-    default_needs_password_chage: bool = Field(
+    default_needs_password_change: bool = Field(
         title="Default user needs password reset status",
         description="If enabled, users will be created with a password reset flag.",
         default=False,
