@@ -1,4 +1,9 @@
 {
+    "github.copilot-labs.showBrushesLenses": false,
+    "github.copilot-labs.showTestGenerationLenses": false,
+    "github.copilot.advanced": {
+
+    },
     "python.testing.pytestArgs": [
         "tests"
     ],

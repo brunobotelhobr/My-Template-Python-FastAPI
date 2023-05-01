@@ -5,7 +5,8 @@ import toml
 from pytest import fixture
 
 from api import settings
-from src.api import database, environment, main, users, utils
+from api.settings import schema
+from src.api import database, main, users, utils
 
 
 def test_version() -> None:

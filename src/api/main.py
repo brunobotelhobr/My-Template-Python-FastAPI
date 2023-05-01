@@ -2,7 +2,10 @@
 import toml
 from fastapi import FastAPI
 
+from api.database import init_db
 from api.environment import db, env
+from api.settings.router import router as settings_router
+from api.settings.router import settings
 from api.users.router import router as user_router
 
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
@@ -25,6 +28,11 @@ async def startup() -> None:
         raise ValueError("Enviroment not initialized")
     if db is None:
         raise ValueError("Database settings not initialized")
+    if env.local.is_debug:
+        print("Creating database tables...")
+        init_db()
+    print("Loading configuration...")
+    settings.load()
 
 
 @app.on_event("shutdown")
@@ -46,6 +54,7 @@ def version() -> dict[str, str]:
 
 
 app.include_router(user_router, prefix="/users", tags=["Users"])
+app.include_router(settings_router, prefix="/admin/settings", tags=["Settings"])
 
 if __name__ == "__main__":
     import uvicorn

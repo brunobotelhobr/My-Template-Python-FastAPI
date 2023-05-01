@@ -2,6 +2,7 @@
 import hashlib
 import random
 import string
+from datetime import datetime
 from uuid import uuid4
 
 
@@ -116,6 +117,10 @@ class RandonGenerator:
     def hasher(self, password: str, salt: str) -> str:
         """Return a hashed password."""
         return str(hashlib.sha256(password.encode() + salt.encode()).hexdigest())
+
+    def now(self) -> datetime:
+        """Return a datetime object."""
+        return datetime.now()
 
     def __new__(cls):
         """Create a singleton."""

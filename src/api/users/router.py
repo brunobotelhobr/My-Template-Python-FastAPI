@@ -4,16 +4,13 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from api.database import Base, engine, session
-from api.settings import settings
+from api.database import session
+from api.settings.router import settings
 from api.users.model import UserORM
 from api.users.schema import UserBase, UserDB, UserIn, UserOut
 from api.utils import generator
 
 router = APIRouter()
-
-# Create database tables.
-Base.metadata.create_all(bind=engine)
 
 
 # Dependency
@@ -54,6 +51,11 @@ def create_user(user_in: UserIn, database: Session = Depends(get_db)):
     password_hash = generator.hasher(password=user_in.password, salt=salt)
     # Validate Model
     user_db = UserDB(**user_in.dict(), salt=salt, password_hash=password_hash, key=key)
+    # Setting default values.
+    user_db.active = settings.users.default_active
+    user_db.verified = settings.users.default_verified
+    user_db.password_change = settings.users.default_needs_password_chage
+    user_db.password_setiing_date = generator.now()
     # Convert to ORM and save.
     user_db = UserORM(**user_db.dict(exclude_unset=True))  # type: ignore
     database.add(user_db)
@@ -75,13 +77,13 @@ def delete_user(key: str, database: Session = Depends(get_db)):
 
 
 @router.patch("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
-def update_user(user: UserBase, key: str, database: Session = Depends(get_db)):
+def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)):
     """Update a user."""
-    user = get_user(key=key)
-    if user is None:
+    user_db = get_user(key=key)
+    if user_db is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    for var, value in vars(user).items():
-        if var in vars(user):
-            setattr(user, var, value)
+    update_data = user_in.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(user_db, key, value)
     database.commit()
-    return user
+    return user_db

@@ -20,6 +20,11 @@ session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class Base(DeclarativeBase):
-    """Base class for all the database models."""
+    """Base class for all the database models."""  # pylint: disable=too-few-public-methods
 
-    pass
+    pass  # pylint: disable=unnecessary-pass
+
+
+def init_db() -> None:
+    """Initialize the database."""
+    Base.metadata.create_all(bind=engine)

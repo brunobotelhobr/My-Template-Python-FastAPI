@@ -1,1 +1,1 @@
-"""Users API module."""
+"""Users module."""
