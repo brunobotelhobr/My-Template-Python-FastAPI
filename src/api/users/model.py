@@ -17,6 +17,6 @@ class UserORM(Base):
     password_hash = Column(String(128), nullable=True)
     active = Column(Boolean, default=True)
     blocked = Column(Boolean, default=False)
-    password_change = Column(Boolean, default=False)
+    need_password_change = Column(Boolean, default=False)
     password_strickes = Column(Integer, default=0)
     verified = Column(Boolean, default=False)

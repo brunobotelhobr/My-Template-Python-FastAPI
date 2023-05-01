@@ -13,7 +13,7 @@ class RandonGenerator:
 
     def uuid(self) -> str:
         """Return au UUDI4."""
-        return str(uuid4().hex)
+        return str(uuid4())
 
     def salt(self) -> str:
         """Return a random salt."""
@@ -48,16 +48,15 @@ class RandonGenerator:
         name = ""
         # Loop through words.
         for _ in range(words):
-            # Generate a random string of 8 characters.
-            n = random.choice(string.ascii_letters) * 8
-            # If first_caps is True, capitalize the first letter of n.
+            # Generate a random string of 7 characters.
+            n = random.choices(string.ascii_letters, k=7)
             if first_caps:
-                n = n.capitalize()
-            # Add n to name.
-            name = name + n
-            # If this is not the last word, add a space.
-            if _ != words - 1:
-                name = name + " "
+                c = n[0].upper()
+                n.pop(0)
+                n.insert(0, c)
+            # Add the word to the name.
+            name += "".join(n) + " "
+        # Return the name.
         return name
 
     def password(self, size: int = 12, numbers: int = 1, special: int = 1, uper: int = 1, lower=1) -> str:

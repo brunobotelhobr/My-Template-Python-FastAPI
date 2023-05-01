@@ -1,6 +1,6 @@
 """Main module for the API."""
 import toml  # type: ignore
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 
 from api.database import init_db
 from api.environment import db, env
@@ -53,8 +53,12 @@ def version() -> dict[str, str]:
     return {"version": app_version}
 
 
-app.include_router(user_router, prefix="/users", tags=["Users"])
-app.include_router(settings_router, prefix="/admin/settings", tags=["Settings"])
+admin = APIRouter(prefix="/admin", tags=["Admin"])
+
+
+admin.include_router(user_router, prefix="/users", tags=["Users"])
+admin.include_router(settings_router, prefix="/admin/settings", tags=["Settings"])
+app.include_router(admin, prefix="/admin", tags=["Admin"])
 
 if __name__ == "__main__":
     import uvicorn

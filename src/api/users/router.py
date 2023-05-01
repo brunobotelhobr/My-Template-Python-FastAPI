@@ -54,7 +54,7 @@ def create_user(user_in: UserIn, database: Session = Depends(get_db)):
     # Setting default values.
     user_db.active = settings.users.default_active
     user_db.verified = settings.users.default_verified
-    user_db.password_change = settings.users.default_needs_password_chage
+    user_db.need_password_change = settings.users.default_needs_password_chage
     user_db.password_setiing_date = generator.now()
     # Convert to ORM and save.
     user_db = UserORM(**user_db.dict(exclude_unset=True))  # type: ignore
