@@ -44,23 +44,20 @@ class RandonGenerator:
             >>> generator.name(words=2, first_caps=False)
             'john doe'
         """
-        # Initialize name.
         name = ""
-        # Loop through words.
         for _ in range(words):
-            # Generate a random string of 7 characters.
-            n = random.choices(string.ascii_letters, k=7)
             if first_caps:
-                c = n[0].upper()
-                n.pop(0)
-                n.insert(0, c)
-            # Add the word to the name.
-            name += "".join(n) + " "
-        # Return the name.
-        return name
+                name += random.choice(string.ascii_letters).upper()
+            for _ in range(random.randint(3, 8)):
+                name += random.choice(string.ascii_lowercase)
+            name += " "
+        return name[:-1]
 
     def password(self, size: int = 12, numbers: int = 1, special: int = 1, uper: int = 1, lower=1) -> str:
-        """Return a random password.
+        """
+        Summary.
+
+            Return a random password.
 
         Args:
             size (int, optional): Size of password. Defaults to 12.

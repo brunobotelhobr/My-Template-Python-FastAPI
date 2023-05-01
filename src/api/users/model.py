@@ -1,6 +1,5 @@
 """User database model."""
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
-from sqlalchemy.sql import func
 
 from api.database import Base
 
@@ -20,5 +19,5 @@ class UserORM(Base):
     blocked = Column(Boolean, default=False)
     need_password_change = Column(Boolean, default=False)
     password_attempts_count = Column(Integer, default=0)
-    password_setting_date = Column(DateTime(timezone=True), onupdate=func.now())
+    password_setting_date = Column(DateTime(timezone=True))
     verified = Column(Boolean, default=False)

@@ -13,7 +13,10 @@ def test_user_base():
     assert UserBase(name=name, email=email)  # type: ignore
 
     with pytest.raises(ValidationError):
-        UserBase(name="a", email=email)  # type: ignore
+        UserBase(name="", email=email)  # type: ignore
+
+    with pytest.raises(ValidationError):
+        UserBase(name="a" * 20, email=email)  # type: ignore
 
     with pytest.raises(ValidationError):
         UserBase(name=name, email="a")  # type: ignore

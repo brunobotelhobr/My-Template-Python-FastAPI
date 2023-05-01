@@ -6,20 +6,20 @@ from api.users.settings import PasswordPolicy, SettingsUser
 
 def test_password_policy():
     """Test PasswordPolicy validator."""
-    pp = PasswordPolicy()
-    assert pp.active
-    assert pp.min_length == 8
-    assert pp.max_length == 64
-    assert pp.min_upper == 1
-    assert pp.min_lower == 1
-    assert pp.min_digits == 1
-    assert pp.min_special == 1
-    assert pp.min_length == 8
+    poassword_policy = PasswordPolicy()
+    assert poassword_policy.active
+    assert poassword_policy.min_length == 8
+    assert poassword_policy.max_length == 64
+    assert poassword_policy.min_upper == 1
+    assert poassword_policy.min_lower == 1
+    assert poassword_policy.min_digits == 1
+    assert poassword_policy.min_special == 1
+    assert poassword_policy.min_length == 8
 
     # Validate if min_length can be equal to max_length
-    pp = PasswordPolicy(min_length=8, max_length=8)
-    assert pp.min_length == 8
-    assert pp.max_length == 8
+    poassword_policy = PasswordPolicy(min_length=8, max_length=8)
+    assert poassword_policy.min_length == 8
+    assert poassword_policy.max_length == 8
 
     # Validate neggative values
     with pytest.raises(ValidationError):
@@ -55,8 +55,8 @@ def test_password_policy():
 
 def test_settings_user():
     """Test SettingsUser validator."""
-    su = SettingsUser()
-    assert su.strickes == 3
+    user_settings = SettingsUser()
+    assert user_settings.strickes == 3
 
     # Validate negative values
     with pytest.raises(ValidationError):

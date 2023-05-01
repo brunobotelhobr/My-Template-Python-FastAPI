@@ -35,42 +35,35 @@ class UserIn(UserBase):
     def passwords_match(cls, v):  # pylint: disable=E0213
         """Validate password and confirm_password match."""
         print(settings.users)
-        print(type(settings))
-        print(type(settings.users))
-        print(type(settings.users.password_policy))
         if settings.users.password_policy.active:
-            if len(v) < settings.users.password_policy.min_length:
-                raise ValueError("must be at least " + str(settings.users.password_policy.min_length) + " characters")
-            if len(v) > settings.users.password_policy.max_length:
-                raise ValueError("must be less than " + str(settings.users.password_policy.max_length) + " characters")
-            if settings.users.password_policy.min_upper > 0:
-                c = 0
-                for i in v:
-                    if i.isupper():
-                        c = c + 1
-                if c < settings.users.password_policy.min_upper:
-                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_upper) + " upper case characters")
-            if settings.users.password_policy.min_lower > 0:
-                c = 0
-                for i in v:
-                    if i.islower():
-                        c = c + 1
-                if c < settings.users.password_policy.min_lower:
-                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_lower) + " lower case characters")
-            if settings.users.password_policy.min_digits > 0:
-                c = 0
-                for i in v:
-                    if i.isdigit():
-                        c = c + 1
-                if c < settings.users.password_policy.min_digits:
-                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_digits) + " digits")
-            if settings.users.password_policy.min_special > 0:
-                c = 0
-                for i in v:
-                    if not i.isalnum():
-                        c = c + 1
-                if c < settings.users.password_policy.min_special:
-                    raise ValueError("must contain at least " + str(settings.users.password_policy.min_special) + " special characters")
+            min_length = settings.users.password_policy.min_length
+            max_length = settings.users.password_policy.max_length
+            min_upper = settings.users.password_policy.min_upper
+            min_lower = settings.users.password_policy.min_lower
+            min_digits = settings.users.password_policy.min_digits
+            min_special = settings.users.password_policy.min_special
+
+            if len(v) < min_length:
+                raise ValueError(f"Password must have at least {min_length} characters")
+
+            if len(v) > max_length:
+                raise ValueError(f"Password must have at most {max_length} characters")
+
+            if min_upper > 0:
+                if sum(1 for i in v if i.isupper()) < min_upper:
+                    raise ValueError(f"Password must have at least {min_upper} uppercase letters")
+
+            if min_lower > 0:
+                if sum(1 for i in v if i.islower()) < min_lower:
+                    raise ValueError(f"Password must have at least {min_lower} lowercase letters")
+
+            if min_digits > 0:
+                if sum(1 for i in v if i.isdigit()) < min_digits:
+                    raise ValueError(f"Password must have at least {min_digits} digits")
+
+            if min_special > 0:
+                if sum(1 for i in v if not i.isalnum()) < min_special:
+                    raise ValueError(f"Password must have at least {min_special} special characters")
         return v
 
     class Config:

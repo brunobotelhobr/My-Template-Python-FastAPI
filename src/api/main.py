@@ -11,12 +11,7 @@ from api.users.router import router as user_router
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
 app_version = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
 
-app = FastAPI(
-    title=app_name,
-    version=app_version,
-    debug=env.local.is_debug,
-    docs_url="/",
-)
+app = FastAPI(title=app_name, version=app_version, debug=env.local.is_debug, docs_url="/", swagger_ui_parameters={"operationsSorter": "method"})
 
 
 @app.on_event("startup")

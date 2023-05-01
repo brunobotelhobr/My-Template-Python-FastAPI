@@ -26,10 +26,10 @@ def get_db():
 @router.get("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
 def get_user(key: str, database: Session = Depends(get_db)):
     """Get a user."""
-    user = database.query(UserORM).filter(UserORM.key == key).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    u = database.query(UserORM).filter(UserORM.key == key).first()
+    if not u:
+        raise HTTPException(status_code=404, detail="Not found.")
+    return u
 
 
 @router.get("/", response_model=List[UserOut], status_code=status.HTTP_200_OK)
@@ -42,44 +42,41 @@ def get_users(skip: int = 0, limit: int = settings.api.get_default_page_size, da
 def create_user(user_in: UserIn, database: Session = Depends(get_db)):
     """Create a new user."""
     # Check if a user with the same email exists.
-    user_orm = database.query(UserORM).filter(UserORM.email == user_in.email).first()
-    if user_orm is not None:
-        raise HTTPException(status_code=404, detail="Email already exists in the system")
+    u = database.query(UserORM).filter(UserORM.email == user_in.email).first()
+    if u is not None:
+        raise HTTPException(status_code=404, detail="Not processed: Email already exists.")
     # Generate calculated fields.
     key = generator.uuid()
     salt = generator.salt()
     password_hash = generator.hasher(password=user_in.password, salt=salt)
     # Validate Model
-    user_db = UserDB(**user_in.dict(), salt=salt, password_hash=password_hash, key=key)
+    u = UserDB(**user_in.dict(), salt=salt, password_hash=password_hash, key=key)  # type: ignore
     # Convert to ORM and save.
-    print(user_db.dict())
-    user_db = UserORM(**user_db.dict())  # type: ignore
-    database.add(user_db)
+    u = UserORM(**u.dict())  # type: ignore
+    database.add(u)
     database.commit()
-    return user_db
+    return u
 
 
 @router.delete("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
 def delete_user(key: str, database: Session = Depends(get_db)):
     """Delete a user."""
     if settings.users.allow_delete is False:
-        raise HTTPException(status_code=404, detail="Delete is not allowed.")
-    user = get_user(key=key)
-    if user is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    database.delete(user)
+        raise HTTPException(status_code=404, detail="Not processed: User deletion is not allowed.")
+    u = database.query(UserORM).filter(UserORM.key == key).first()
+    if u is None:
+        raise HTTPException(status_code=404, detail="Not found.")
+    database.delete(u)
     database.commit()
-    return user
+    return u
 
 
 @router.patch("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
 def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)):
     """Update a user."""
-    user_db = get_user(key=key)
-    if user_db is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    u = user_in.dict(exclude_unset=True)
-    for key, value in u.items():
-        setattr(user_db, key, value)
-    database.commit()
-    return user_db
+    u = database.query(UserORM).filter(UserORM.key == key).first()
+    if u is None:
+        raise HTTPException(status_code=404, detail="Not found.")
+    for k, v in user_in.dict(exclude_unset=True).items():
+        setattr(u, k, v)
+    return u
