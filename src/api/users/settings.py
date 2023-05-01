@@ -77,14 +77,14 @@ class SettingsUser(BaseModel):
     block_user_on_password_strickes: bool = Field(
         title="Block user on password strickes", description="If enabled, users will be blocked on password strickes.", default=True
     )
-    strickes: int = Field(title="Block the user with this numeber of fail authentications" , description="Default number of password strickes.", default=3)
+    strickes: int = Field(title="Block the user with this numeber of fail authentications", description="Default number of password strickes.", default=3)
     password_policy: PasswordPolicy = Field(title="Password policy", description="Password policy to be applied to all users.", default=PasswordPolicy())
 
     @root_validator
     def settings_user_validator(cls, v):  # pylint: disable=E0213
         """Validate settings user."""
-        if v["default_password_strickes"] < 0:
-            raise ValueError("default_password_strickes must be greater than or equal to 0")
+        if v["strickes"] < 1:
+            raise ValueError("strickes must be greater than or equal to 1")
         return v
 
     class Config:  # pylint: disable=too-few-public-methods

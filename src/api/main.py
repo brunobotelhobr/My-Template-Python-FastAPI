@@ -1,5 +1,5 @@
 """Main module for the API."""
-import toml
+import toml  # type: ignore
 from fastapi import FastAPI
 
 from api.database import init_db

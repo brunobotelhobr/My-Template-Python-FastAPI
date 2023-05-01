@@ -1,5 +1,4 @@
 """User schema."""
-import datetime
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, validator
@@ -82,8 +81,8 @@ class UserOut(UserBase):
     active: bool = Field(example=True, title="Active")
     blocked: bool = Field(example=False, title="Blocked")
     verified: bool = Field(example=False, title="Verified")
-    password_change: bool = Field(example=False, title="Need Password Change")
-    password_strickes: int = Field(example=0, title="Password Strickes")
+    need_password_change: bool = Field(example=False, title="Need Password Change")
+    password_attempts_count: int = Field(example=0, title="Password Strickes")
     password_setiing_date: datetime = Field(example="2021-01-01 00:00:00", title="Password Setting Date")
 
     class Config:
@@ -100,8 +99,8 @@ class UserDB(UserBase):
     active: bool = Field(example=True, title="Active")
     blocked: bool = Field(example=False, title="Blocked")
     verified: bool = Field(example=False, title="Verified")
-    password_change: bool = Field(example=False, title="Need Password Change")
-    password_strickes: int = Field(example=0, title="Password Strickes")
+    need_password_change: bool = Field(example=False, title="Need Password Change")
+    password_attempts_count: int = Field(example=0, title="Password Strickes")
     password_hash: str = Field(example="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Password Hash")
     password_setiing_date: datetime = Field(example="2021-01-01 00:00:00", title="Password Setting Date")
 
