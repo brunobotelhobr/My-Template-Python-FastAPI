@@ -82,8 +82,8 @@ def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)
     user_db = get_user(key=key)
     if user_db is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    update_data = user_in.dict(exclude_unset=True)
-    for key, value in update_data.items():
+    u = user_in.dict(exclude_unset=True)
+    for key, value in u.items():
         setattr(user_db, key, value)
     database.commit()
     return user_db

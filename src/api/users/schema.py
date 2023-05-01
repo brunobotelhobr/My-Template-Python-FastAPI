@@ -33,6 +33,10 @@ class UserIn(UserBase):
     @validator("password")
     def passwords_match(cls, v):  # pylint: disable=E0213
         """Validate password and confirm_password match."""
+        print(settings.users)
+        print(type(settings))
+        print(type(settings.users))
+        print(type(settings.users.password_policy))
         if settings.users.password_policy.active:
             if len(v) < settings.users.password_policy.min_length:
                 raise ValueError("must be at least " + str(settings.users.password_policy.min_length) + " characters")

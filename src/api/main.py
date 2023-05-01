@@ -53,12 +53,11 @@ def version() -> dict[str, str]:
     return {"version": app_version}
 
 
-admin = APIRouter(prefix="/admin", tags=["Admin"])
+admin = APIRouter(tags=["Admin"])
+admin.include_router(user_router, prefix="/users")
+admin.include_router(settings_router, prefix="/settings")
 
-
-admin.include_router(user_router, prefix="/users", tags=["Users"])
-admin.include_router(settings_router, prefix="/admin/settings", tags=["Settings"])
-app.include_router(admin, prefix="/admin", tags=["Admin"])
+app.include_router(admin, prefix="/admin")
 
 if __name__ == "__main__":
     import uvicorn

@@ -111,3 +111,13 @@ def test_user_password():  # type: ignore
     s.active = True
     with pytest.raises(ValidationError):
         UserIn(name=generator.name(), email=generator.email(), password="a")  # type: ignore
+
+def test_user_name():
+    """Test name validation."""
+    with pytest.raises(ValidationError):
+        UserIn(name="A", email=generator.email(), password=generator.password())  # type: ignore
+
+def test_user_email():
+    """Test email validation."""
+    with pytest.raises(ValidationError):
+        UserIn(name=generator.name(), email="a", password=generator.password())  # type: ignore
