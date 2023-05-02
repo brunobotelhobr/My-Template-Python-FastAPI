@@ -1,10 +1,5 @@
-import json
+from pydantic import BaseModel, root_validator
 
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
-
-from api.database import engine
-from api.settings.model import SettingsORM
 from api.users.settings import SettingsUser
 
 
@@ -14,6 +9,15 @@ class SettingsAPI(BaseModel):
     # Get Parameters
     get_max_page_size: int = 1000
     get_default_page_size: int = 100
+
+    @root_validator
+    def validate_get_max_page_size(cls, values):  # pylint: disable=E0213
+        """Validate get_max_page_size."""
+        if values["get_max_page_size"] < 1:
+            raise ValueError("get_max_page_size must be greater than 0")
+        if values["get_max_page_size"] <= values["get_default_page_size"]:
+            raise ValueError("get_max_page_size must be greater or equal than get_default_page_size")
+        return values
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
@@ -27,35 +31,6 @@ class SettingsModel(BaseModel):
     name: str = "global"
     api: SettingsAPI = SettingsAPI()
     users: SettingsUser = SettingsUser()
-
-    def save(self) -> bool:
-        """Save the configuration to the database."""
-        with Session(engine) as session:
-            with Session(engine) as session:
-                s = session.query(SettingsORM).filter(SettingsORM.name == self.name).first()
-                if s:
-                    s.data = str(self.json())  # type: ignore
-                    session.commit()
-                else:
-                    s = SettingsORM(name=self.name, data=str(self.json()))
-                    session.add(s)
-                    session.commit()
-                return True
-
-    def load(self) -> bool:
-        """Load the configuration from the database."""
-        with Session(engine) as session:
-            s = session.query(SettingsORM).filter(SettingsORM.name == self.name).first()
-            if s:
-                loaded = json.loads(str(s.data))
-                for key, value in loaded.items():
-                    if hasattr(self, key):
-                        orm_model = self.__fields__[key].type_
-                        if issubclass(orm_model, BaseModel):
-                            setattr(self, key, orm_model(**value))
-                        else:
-                            setattr(self, key, value)
-            return True
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""

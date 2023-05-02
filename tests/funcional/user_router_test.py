@@ -62,7 +62,7 @@ def test_user_get():
 
 def test_user_list():
     """Test User List."""
-    response = client.get("/admin/users/")
+    response = client.get("/admin/users/?limit=1000")
     assert response.status_code == 200
     # Check if each of the users in the list is in the response.
     for u in users:

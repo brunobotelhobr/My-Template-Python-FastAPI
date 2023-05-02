@@ -1,13 +1,16 @@
-from fastapi.testclient import TestClient
-from src.api.main import app
 import re
+
 import toml  # type: ignore
+from fastapi.testclient import TestClient
+
+from src.api.main import app
+
 client = TestClient(app)
 
 
 def test_health() -> None:
     """Test the health."""
-    response = client.get("/health")
+    response = client.get("/healthcheck")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
@@ -21,7 +24,7 @@ def test_not_found() -> None:
 
 def test_docs() -> None:
     """Test the docs."""
-    response = client.get("/docs")
+    response = client.get("/")
     assert response.status_code == 200
 
 

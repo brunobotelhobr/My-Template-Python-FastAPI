@@ -15,3 +15,14 @@ async def login(user: AuthRequest):
             detail="Invalid email or password",
         )
     return {"access_token": auth.jwt.generate(user)}
+
+@router.get("/logout", response_model=schemas.Token)
+async def login(user: AuthRequest):
+    """Login route."""
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+    return {"access_token": auth.jwt.generate(user)}
