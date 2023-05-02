@@ -58,6 +58,17 @@ def create_user(user_in: UserIn, database: Session = Depends(get_db)):
     return u
 
 
+@router.patch("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
+def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)):
+    """Update a user."""
+    u = database.query(UserORM).filter(UserORM.key == key).first()
+    if u is None:
+        raise HTTPException(status_code=404, detail="Not found.")
+    for k, v in user_in.dict(exclude_unset=True).items():
+        setattr(u, k, v)
+    return u
+
+
 @router.delete("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
 def delete_user(key: str, database: Session = Depends(get_db)):
     """Delete a user."""
@@ -68,15 +79,4 @@ def delete_user(key: str, database: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Not found.")
     database.delete(u)
     database.commit()
-    return u
-
-
-@router.patch("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
-def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)):
-    """Update a user."""
-    u = database.query(UserORM).filter(UserORM.key == key).first()
-    if u is None:
-        raise HTTPException(status_code=404, detail="Not found.")
-    for k, v in user_in.dict(exclude_unset=True).items():
-        setattr(u, k, v)
     return u

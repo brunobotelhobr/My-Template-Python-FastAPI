@@ -1,5 +1,6 @@
 from pydantic import BaseModel, root_validator
 
+from api.auth.settings import SettingsAuth
 from api.users.settings import SettingsUser
 
 
@@ -30,6 +31,7 @@ class SettingsModel(BaseModel):
 
     name: str = "global"
     api: SettingsAPI = SettingsAPI()
+    auth: SettingsAuth = SettingsAuth()
     users: SettingsUser = SettingsUser()
 
     class Config:

@@ -7,7 +7,7 @@ from uuid import uuid4
 
 
 class RandonGenerator:
-    """Class to generate IDs for models."""
+    """Class to generate random values."""
 
     __instance = None
 

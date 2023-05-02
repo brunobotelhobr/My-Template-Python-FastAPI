@@ -3,6 +3,8 @@ from enum import Enum
 
 from pydantic import BaseSettings
 
+from api.utils import generator
+
 
 class Environment(str, Enum):
     """Supported environments and their properties."""
@@ -45,6 +47,7 @@ class RunnigeEnviroment(BaseSettings):
     """Class to store the enviroment of the API."""
 
     local: Environment = Environment.LOCAL
+    jwt_key = generator.uuid()
 
     class Config:  # pylint: disable=too-few-public-methods
         """Load environment variables with a prefix and make them case sensitive."""

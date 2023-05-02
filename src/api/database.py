@@ -29,3 +29,11 @@ def init_db() -> bool:
     """Initialize the database."""
     Base.metadata.create_all(bind=engine)
     return True
+
+def get_db():
+    """Dependency to get a database session."""
+    database = session()
+    try:
+        yield database
+    finally:
+        database.close()

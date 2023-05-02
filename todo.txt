@@ -10,3 +10,9 @@ test coverage
 test init Db 
 
 test 
+
+singletons, utils
+
+need password change?
+
+user http status for exceptions
