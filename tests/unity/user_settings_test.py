@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from api.users.settings import PasswordPolicy, SettingsUser
 
 
+@pytest.mark.order(2)
 def test_password_policy():
     """Test PasswordPolicy validator."""
     poassword_policy = PasswordPolicy()
@@ -53,6 +54,7 @@ def test_password_policy():
         PasswordPolicy(max_length=129)
 
 
+@pytest.mark.order(2)
 def test_settings_user():
     """Test SettingsUser validator."""
     user_settings = SettingsUser()

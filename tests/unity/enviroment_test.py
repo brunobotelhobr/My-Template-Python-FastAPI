@@ -3,6 +3,7 @@ import pytest
 from api.environment import DatabaseSettings, Environment, RunnigeEnviroment
 
 
+@pytest.mark.order(2)
 @pytest.mark.parametrize(
     "env, expected_debug, expected_testing, expected_deployed",
     [
@@ -19,6 +20,7 @@ def test_is_debug_testing_deployed(env, expected_debug, expected_testing, expect
     assert env.is_deployed == expected_deployed
 
 
+@pytest.mark.order(2)
 def test_database_settings():
     """Test the DatabaseSettings class."""
     database = DatabaseSettings()
@@ -26,6 +28,7 @@ def test_database_settings():
     assert database.aut_create_models is True
 
 
+@pytest.mark.order(2)
 def test_running_environment():
     """Test the RunnigeEnviroment class."""
     env = RunnigeEnviroment()

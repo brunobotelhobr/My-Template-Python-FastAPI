@@ -1,11 +1,13 @@
 """Test utils."""
 import string
 
+import pytest
 from pytest import raises
 
 from api.utils import generator
 
 
+@pytest.mark.order(2)
 def test_generator():
     """Test generator."""
     assert generator.name()

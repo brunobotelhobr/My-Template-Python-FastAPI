@@ -1,5 +1,6 @@
 import re
 
+import pytest
 import toml  # type: ignore
 from fastapi.testclient import TestClient
 
@@ -8,6 +9,7 @@ from src.api.main import app
 client = TestClient(app)
 
 
+@pytest.mark.order(3)
 def test_health() -> None:
     """Test the health."""
     response = client.get("/healthcheck")
@@ -15,6 +17,7 @@ def test_health() -> None:
     assert response.json() == {"status": "ok"}
 
 
+@pytest.mark.order(3)
 def test_not_found() -> None:
     """Test the not found."""
     response = client.get("/not-found")
@@ -22,12 +25,14 @@ def test_not_found() -> None:
     assert response.json() == {"detail": "Not Found"}
 
 
+@pytest.mark.order(3)
 def test_docs() -> None:
     """Test the docs."""
     response = client.get("/")
     assert response.status_code == 200
 
 
+@pytest.mark.order(3)
 def test_openapi() -> None:
     """Test the openapi."""
     response = client.get("/openapi.json")

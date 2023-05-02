@@ -1,10 +1,12 @@
 LOGS,
-SALVAR Config
+
 auth
 LOGIN
 LOGOUT
 /mE 
 /PASSWORD RESET
 
-VSCODE PLAY INTEGRATION
-COM DEBUS
+test coverage
+test init Db 
+
+test 

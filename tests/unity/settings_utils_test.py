@@ -1,9 +1,12 @@
 import unittest
 
+import pytest
+
 from api.settings.schema import SettingsModel
 from api.settings.utils import load, reset, save
 
 
+@pytest.mark.order(2)
 class TestUtils(unittest.TestCase):
     """TestCase for settings utils."""
 

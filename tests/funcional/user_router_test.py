@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
@@ -14,6 +15,7 @@ client = TestClient(app)
 users = []
 
 
+@pytest.mark.order(3)
 def test_create_user():
     """Test User Creation."""
     # Test valid creation
@@ -45,6 +47,7 @@ def test_create_user():
     assert response.status_code == 422
 
 
+@pytest.mark.order(3)
 def test_user_get():
     """Test User Get."""
     for u in users:
@@ -60,6 +63,7 @@ def test_user_get():
     assert response.status_code == 404
 
 
+@pytest.mark.order(3)
 def test_user_list():
     """Test User List."""
     response = client.get("/admin/users/?limit=1000")
@@ -79,6 +83,7 @@ def test_user_list():
     assert response.status_code == 422
 
 
+@pytest.mark.order(3)
 def test_user_update():
     """Test User Update."""
     for u in users:
@@ -108,6 +113,7 @@ def test_user_update():
     assert response.status_code == 422
 
 
+@pytest.mark.order(3)
 def test_user_delete():
     """Test User Delete."""
     # Test delete disabled

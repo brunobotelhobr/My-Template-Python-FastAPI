@@ -25,6 +25,7 @@ class Base(DeclarativeBase):
     pass  # pylint: disable=unnecessary-pass
 
 
-def init_db() -> None:
+def init_db() -> bool:
     """Initialize the database."""
     Base.metadata.create_all(bind=engine)
+    return True

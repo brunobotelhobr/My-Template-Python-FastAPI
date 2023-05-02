@@ -1,11 +1,13 @@
 import unittest
 
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
 from api.settings.schema import SettingsModel
 
 
+@pytest.mark.order(3)
 class TestSettings(unittest.TestCase):
     """Test Settings."""
 

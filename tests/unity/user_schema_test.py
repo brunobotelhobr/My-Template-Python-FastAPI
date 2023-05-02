@@ -6,6 +6,7 @@ from api.users.schema import UserBase, UserDB, UserIn, UserOut
 from api.utils import generator
 
 
+@pytest.mark.order(2)
 def test_user_base():
     """Test UserBase validator."""
     name = str(generator.name())
@@ -22,6 +23,7 @@ def test_user_base():
         UserBase(name=name, email="a")  # type: ignore
 
 
+@pytest.mark.order(2)
 def test_user_in():
     """Test UserIn validator."""
     name = str(generator.name())
@@ -30,6 +32,7 @@ def test_user_in():
     assert UserIn(name=name, email=email, password=password)  # type: ignore
 
 
+@pytest.mark.order(2)
 def test_user_out():
     """Test UserOut validator."""
     name = generator.name()
@@ -49,6 +52,7 @@ def test_user_out():
     )  # type: ignore
 
 
+@pytest.mark.order(2)
 def test_user_db():
     """Test UserDB validator."""
     key = generator.uuid()
@@ -73,6 +77,7 @@ def test_user_db():
     )
 
 
+@pytest.mark.order(2)
 def test_user_password():  # type: ignore
     """Test password validation."""
     # Test names must contain a speace
@@ -116,12 +121,14 @@ def test_user_password():  # type: ignore
         UserIn(name=generator.name(), email=generator.email(), password="a")  # type: ignore
 
 
+@pytest.mark.order(2)
 def test_user_name():
     """Test name validation."""
     with pytest.raises(ValidationError):
         UserIn(name="A", email=generator.email(), password=generator.password())  # type: ignore
 
 
+@pytest.mark.order(2)
 def test_user_email():
     """Test email validation."""
     with pytest.raises(ValidationError):

@@ -84,11 +84,11 @@ cmd = "uvicorn {name}.main:app --reload"
 help = "Run application"
 
 [tool.taskipy.tasks.pre-commit]
-cmd = "task format && task lint && task tests"
+cmd = "task format && task lint && task test"
 help = "Run all pre-commit tasks"
 
 [tool.taskipy.tasks.pre-release]
-cmd = "task pre-commit && task bom && task req &&  task sec"
+cmd = "task pre-commit && task bom && task req && task sec"
 help = "Run all pre-release tasks"
 
 [tool.taskipy.tasks.info]
@@ -211,6 +211,9 @@ flake8-bugbear = "^23.3.23"
 flake8-docstrings = "^1.7.0"
 flake8-tidy-imports = "^4.8.0"
 taskipy = "^1.10.4"
+httpx = "^0.24.0"
+pytest-order = "^1.1.0"
+
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.1.6"

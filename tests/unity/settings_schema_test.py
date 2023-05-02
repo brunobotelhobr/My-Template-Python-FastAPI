@@ -1,9 +1,12 @@
 import unittest
 
+import pytest
+
 from api.settings.schema import SettingsAPI, SettingsModel
 from api.utils import generator
 
 
+@pytest.mark.order(2)
 class TestSettingsAPI(unittest.TestCase):
     """Test SettingsAPI."""
 
@@ -32,6 +35,7 @@ class TestSettingsAPI(unittest.TestCase):
             api.validate_get_max_page_size(values)
 
 
+@pytest.mark.order(2)
 class TestSettingsModel(unittest.TestCase):
     """Test SettingsModel."""
 
