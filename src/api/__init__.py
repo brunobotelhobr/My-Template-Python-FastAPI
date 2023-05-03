@@ -1,1 +1,1 @@
-"""Does implementation of the app."""
+"""Main Module."""

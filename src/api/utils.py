@@ -1,4 +1,4 @@
-"""General model utilities."""
+"""General API Utilities."""
 import hashlib
 import random
 import string

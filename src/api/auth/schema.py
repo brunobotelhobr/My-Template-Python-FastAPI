@@ -1,4 +1,6 @@
 """Auth Model."""
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -14,3 +16,15 @@ class Token(BaseModel):
 
     access_token: str
     token_type: str
+
+
+class RevokedToken(BaseModel):
+    """JWT Token Revoked Model."""
+
+    token: str
+    expiration: datetime
+
+    class Config:
+        """Set orm_mode to True to allow returning ORM objects."""
+
+        orm_mode = True

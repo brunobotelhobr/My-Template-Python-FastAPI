@@ -1,3 +1,4 @@
+"""Settings utilities."""
 import json
 
 from pydantic import BaseModel
@@ -50,3 +51,6 @@ def reset(settings: SettingsModel) -> bool:
         session.delete(s)
         session.commit()
         return True
+
+
+global_settings = SettingsModel(name="global")

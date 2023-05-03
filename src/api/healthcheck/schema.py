@@ -1,3 +1,4 @@
+"""Healthcheck Schema."""
 from pydantic import BaseModel, Field
 
 

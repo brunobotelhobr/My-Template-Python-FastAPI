@@ -1,27 +1,18 @@
 LOGS,
 
-auth
-LOGIN
-LOGOUT
-/mE 
-/PASSWORD RESET
 
 test coverage
 test init Db 
 
 test 
 
+auth test
+token renew
 singletons, utils
-
-need password change?
-
-user http status for exceptions
-
-
 
     get_max_page_size: int = 1000
     get_default_page_size: int = 100
-
+rever settings e descriptions
 autenticação via cookie
 docstring modules
 
@@ -30,3 +21,13 @@ logouy "{\"status\": \"Sucessfully logged out.\"}"
 
 module and fuction docstrings
 from api.settings.router import settings
+
+modelf uses fields with descriptions
+uSER: nEED PASSWORD RESET? > tiME TO CHANGE PASSWORD.
+
+uSER sETTINGS:
+    # default_needs_password_change: bool = Field(
+    #     title="Default user needs password reset status",
+    #     description="If enabled, users will be created with a password reset flag.",
+    #     default=False,
+    # )

@@ -1,8 +1,8 @@
+"""Settings router."""
 from fastapi import APIRouter, status
 
 from api.settings.schema import SettingsModel
-from api.settings.utils import load, reset, save
-from api.settings.router import settings
+from api.settings.utils import global_settings, load, reset, save
 
 router = APIRouter()
 
@@ -16,7 +16,7 @@ async def get_settings(name: str = "global"):
 
 
 @router.patch("/", response_model=SettingsModel, status_code=status.HTTP_200_OK)
-async def update_settings(name: str = "global", s: SettingsModel = settings):
+async def update_settings(name: str = "global", s: SettingsModel = global_settings):
     """Update the application settings."""
     if s.name != name:
         s.name = name

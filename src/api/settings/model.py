@@ -1,3 +1,4 @@
+"""Settings model."""
 from sqlalchemy import Column, String
 
 from api.database import Base

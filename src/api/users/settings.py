@@ -1,4 +1,4 @@
-"""User configuration model."""
+"""User settings."""
 from pydantic import BaseModel, Field, root_validator
 
 
@@ -61,7 +61,12 @@ class PasswordPolicy(BaseModel):
 class SettingsUser(BaseModel):
     """User configuration model."""
 
-    allow_delete: bool = Field(title="Allow users to be deleted, ", description="If not enables users can be on deactivated.", default=True)
+    allow_delete: bool = Field(title="Allow users to be deleted, ", description="If not enables users can be only deactivated.", default=True)
+    allow_password_reset: bool = Field(
+        title="Allow password reset to the actual password",
+        description="If enabled, users can reset their passwords if the new one is equal to the actual one.",
+        default=True,
+    )
     default_active: bool = Field(title="Default user active status", description="If disabled, users will be created as inactive.", default=True)
     default_verified: bool = Field(
         title="Default user verified status",
@@ -69,22 +74,19 @@ class SettingsUser(BaseModel):
         default=True,
     )
     default_blocked: bool = Field(title="Default user blocked status", description="If enabled, users will be created as blocked.", default=False)
-    default_needs_password_change: bool = Field(
-        title="Default user needs password reset status",
-        description="If enabled, users will be created with a password reset flag.",
-        default=False,
-    )
     block_user_on_password_strickes: bool = Field(
         title="Block user on password strickes", description="If enabled, users will be blocked on password strickes.", default=True
     )
-    strickes: int = Field(title="Block the user with this numeber of fail authentications", description="Default number of password strickes.", default=3)
+    password_strikes: int = Field(
+        title="Block the user with this numeber of fail authentications", description="It must be greater than or equal to 1, default is 3.", default=3
+    )
     password_policy: PasswordPolicy = Field(title="Password policy", description="Password policy to be applied to all users.", default=PasswordPolicy())
 
     @root_validator
     def settings_user_validator(cls, v):  # pylint: disable=E0213
         """Validate settings user."""
-        if v["strickes"] < 1:
-            raise ValueError("strickes must be greater than or equal to 1")
+        if v["password_strikes"] < 1:
+            raise ValueError("password_strikes must be greater than or equal to 1")
         return v
 
     class Config:  # pylint: disable=too-few-public-methods

@@ -1,4 +1,5 @@
 """Main module for the API."""
+from json import load
 import toml  # type: ignore
 from fastapi import APIRouter, FastAPI, status
 
@@ -8,9 +9,8 @@ from api.environment import db, env
 from api.healthcheck.router import router as healthcheck_router
 from api.myself.router import router as myself_router
 from api.settings.router import router as settings_router
-from api.settings.router import settings
-from api.settings.utils import load, save
 from api.users.router import router as user_router
+from api.settings.utils import load, save, global_settings
 
 # Get app name and version from pyproject.toml
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
@@ -52,9 +52,9 @@ async def startup() -> None:
     # Initialize database, if debug mode is enabled
     if env.local.is_debug:
         init_db()
-    # Load settings, if not exists, create it
-    if load(settings=settings) is False:
-        save(settings=settings)
+    # initialize settings
+    if load(global_settings) is False:
+        save(global_settings)
 
 
 # On Shutdown event

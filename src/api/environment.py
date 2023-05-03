@@ -1,4 +1,4 @@
-"""Module to store the environment variables of the API."""
+"""General environment variables and settings for the API."""
 from enum import Enum
 
 from pydantic import BaseSettings

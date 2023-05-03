@@ -5,12 +5,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from api.database import get_db  # type: ignore
-from api.settings.router import settings
+from api.settings.utils import global_settings
 from api.users.model import UserORM
 from api.users.schema import UserBase, UserDB, UserIn, UserOut
 from api.utils import generator
 
 router = APIRouter()
+
+limit_max = global_settings.api.page_size_max
+limit_init = global_settings.api.page_size_initial
 
 
 @router.get("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
@@ -19,12 +22,15 @@ def get_user(key: str, database: Session = Depends(get_db)):
     u = database.query(UserORM).filter(UserORM.key == key).first()
     if not u:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
+    u = UserOut(**u.__dict__)
     return u
 
 
 @router.get("/", response_model=List[UserOut], status_code=status.HTTP_200_OK)
-def get_users(skip: int = 0, limit: int = settings.api.get_default_page_size, database: Session = Depends(get_db)):
+def get_users(skip: int = 0, limit: int = limit_init, database: Session = Depends(get_db)):
     """Get a list of users."""
+    if limit > limit_max:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad request: Limit must be less than {limit_max}.")
     return database.query(UserORM).offset(skip).limit(limit).all()
 
 
@@ -62,7 +68,7 @@ def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)
 @router.delete("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
 def delete_user(key: str, database: Session = Depends(get_db)):
     """Delete a user."""
-    if settings.users.allow_delete is False:
+    if global_settings.users.allow_delete is False:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Not processed: User deletion is not allowed.")
     u = database.query(UserORM).filter(UserORM.key == key).first()
     if u is None:
