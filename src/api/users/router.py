@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from api.database import session
+from api.database import get_db  # type: ignore
 from api.settings.router import settings
 from api.users.model import UserORM
 from api.users.schema import UserBase, UserDB, UserIn, UserOut
@@ -13,22 +13,12 @@ from api.utils import generator
 router = APIRouter()
 
 
-# Dependency
-def get_db():
-    """Dependency to get a database session."""
-    database = session()
-    try:
-        yield database
-    finally:
-        database.close()
-
-
 @router.get("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
 def get_user(key: str, database: Session = Depends(get_db)):
     """Get a user."""
     u = database.query(UserORM).filter(UserORM.key == key).first()
     if not u:
-        raise HTTPException(status_code=404, detail="Not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
     return u
 
 
@@ -44,7 +34,7 @@ def create_user(user_in: UserIn, database: Session = Depends(get_db)):
     # Check if a user with the same email exists.
     u = database.query(UserORM).filter(UserORM.email == user_in.email).first()
     if u is not None:
-        raise HTTPException(status_code=404, detail="Not processed: Email already exists.")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Not processed: Email already exists.")
     # Generate calculated fields.
     key = generator.uuid()
     salt = generator.salt()
@@ -63,7 +53,7 @@ def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)
     """Update a user."""
     u = database.query(UserORM).filter(UserORM.key == key).first()
     if u is None:
-        raise HTTPException(status_code=404, detail="Not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
     for k, v in user_in.dict(exclude_unset=True).items():
         setattr(u, k, v)
     return u
@@ -73,10 +63,10 @@ def update_user(user_in: UserBase, key: str, database: Session = Depends(get_db)
 def delete_user(key: str, database: Session = Depends(get_db)):
     """Delete a user."""
     if settings.users.allow_delete is False:
-        raise HTTPException(status_code=404, detail="Not processed: User deletion is not allowed.")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Not processed: User deletion is not allowed.")
     u = database.query(UserORM).filter(UserORM.key == key).first()
     if u is None:
-        raise HTTPException(status_code=404, detail="Not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
     database.delete(u)
     database.commit()
     return u

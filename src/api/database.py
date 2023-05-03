@@ -30,6 +30,7 @@ def init_db() -> bool:
     Base.metadata.create_all(bind=engine)
     return True
 
+
 def get_db():
     """Dependency to get a database session."""
     database = session()

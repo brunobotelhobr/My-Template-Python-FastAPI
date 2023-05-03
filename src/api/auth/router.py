@@ -1,27 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+"""Authentication Router."""
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from api.auth.schema import AuthRequest, Token
-from api.auth.utils import jwt_factory
-from api.database import session
+from api.auth.utils import authenticate, jwt_factory  # type: ignore
+from api.database import get_db
+from api.schema import SimpleMessage
 from api.settings.router import settings
 from api.users.model import UserORM
 from api.users.schema import UserDB, UserOut
 from api.utils import generator
 
 router = APIRouter()
-oauth_schema = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-
-# Dependency
-def get_db():
-    """Dependency to get a database session."""
-    database = session()
-    try:
-        yield database
-    finally:
-        database.close()
 
 
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)
@@ -29,10 +21,10 @@ def login(form: OAuth2PasswordRequestForm = Depends(), database: Session = Depen
     """Check if user exists and return JWT."""
     try:
         credetials = AuthRequest(email=form.username, password=form.password)  # type: ignore
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request: Invalid credentials.")
-    q = database.query(UserORM).filter(UserORM.email == credetials.email).first()
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request: Invalid credentials.") from e
     # User Exists?
+    q = database.query(UserORM).filter(UserORM.email == credetials.email).first()
     if not q:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Bad credentials.")
     # Password is correct?
@@ -60,13 +52,14 @@ def login(form: OAuth2PasswordRequestForm = Depends(), database: Session = Depen
     return {"token_type": "bearer", "access_token": t}
 
 
-def authenticate(token: str = Depends(oauth_schema), database: Session = Depends(get_db)) -> UserOut:
-    """Authenticate user."""
-    email = jwt_factory.verify(token)
-    q = database.query(UserORM).filter(UserORM.email == email).first()
-    if not q:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Bad credentials.")
-    u = UserOut(**q.__dict__)  # type: ignore
-    if u.blocked:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: User is blocked.")
-    return u
+@router.get("/logout", status_code=status.HTTP_302_FOUND)
+def protected_route(req: Request, me: UserOut = Depends(authenticate)) -> JSONResponse:
+    """Logout endpoint for the API."""
+    if req.cookies.get("Authorization"):
+        jwt_factory.revoke(req.cookies["Authorization"])
+    if req.headers.get("Authorization"):
+        jwt_factory.revoke(req.headers["Authorization"])
+    resp = JSONResponse(content=SimpleMessage(status="Sucessfully logged out.").json(), status_code=status.HTTP_302_FOUND)
+    resp.delete_cookie("Authorization")
+    resp.headers["Authorization"] = ""
+    return resp

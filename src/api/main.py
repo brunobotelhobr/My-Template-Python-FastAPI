@@ -1,36 +1,43 @@
 """Main module for the API."""
 import toml  # type: ignore
-from fastapi import APIRouter, Depends, FastAPI
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, FastAPI, status
 
-from api.auth.router import authenticate
 from api.auth.router import router as auth_router
-from api.database import init_db
+from api.database import engine, init_db
 from api.environment import db, env
+from api.healthcheck.router import router as healthcheck_router
+from api.myself.router import router as myself_router
 from api.settings.router import router as settings_router
 from api.settings.router import settings
 from api.settings.utils import load, save
 from api.users.router import router as user_router
-from api.users.schema import UserOut
-from api.database import get_db
-from sqlalchemy.orm import Session
 
 # Get app name and version from pyproject.toml
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
 app_version = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
+website = toml.load("pyproject.toml")["tool"]["poetry"]["repository"]
+
+
+# API Initialization parameters
+start: dict[str, any] = {}  # type: ignore
+start["title"] = app_name
+start["version"] = app_version
+start["description"] = "API for the " + app_name + " application."
+start["debug"] = env.local.is_debug
+start["license_info"] = {"name": "MIT", "url": "https://opensource.org/licenses/MIT"}
+start["contact"] = {"name": "Bruno Botelho", "url": website, "email": "bruno.botelho.br@gmail.com"}
+if env.local.is_debug is True:
+    start["redoc_url"] = "/redoc"
+    start["openapi_url"] = "/openapi.json"
+    start["docs_url"] = "/"
+else:
+    start["redoc_url"] = None
+    start["openapi_url"] = None
+    start["docs_url"] = None
+
 
 # Create FastAPI instance
-app = FastAPI(title=app_name, version=app_version, debug=env.local.is_debug)
-
-# Adjust interactive documentation
-if env.local.is_debug is True:
-    app.redoc_url = "/redoc"
-    app.openapi_url = "/openapi.json"
-    app.docs_url = "/docs"
-else:
-    app.redoc_url = None
-    app.openapi_url = None
-    app.docs_url = None
+app = FastAPI(**start)
 
 
 # On Startup event
@@ -49,37 +56,30 @@ async def startup() -> None:
     if load(settings=settings) is False:
         save(settings=settings)
 
+
 # On Shutdown event
 @app.on_event("shutdown")
 async def shutdown() -> None:
     """Triggered when the application is shutting down."""
-    ...
-
-# Healthcheck endpoint
-@app.get("/healthcheck", include_in_schema=False)
-async def healthcheck(database: Session = Depends(get_db)) -> dict[str, str]:
-    """Healthcheck endpoint for load balancers."""
-    return {"status": "error"}
+    engine.dispose()
 
 
-@app.get("/version", tags=["About"])
+# About Endpoints
+@app.get("/version", tags=["About"], status_code=status.HTTP_200_OK)
 def version() -> dict[str, str]:
     """Version endpoint for the API."""
     return {"version": app_version}
 
 
-@app.get("/me", tags=["Me"], response_model=UserOut)
-def me(who: UserOut = Depends(authenticate)) -> UserOut:
-    """Me endpoint for the API."""
-    return who
-
-
+# Enpoints
+app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(myself_router, prefix="/myself", tags=["Myself"])
 admin = APIRouter(tags=["Admin"])
 admin.include_router(user_router, prefix="/users")
 admin.include_router(settings_router, prefix="/settings")
-
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(admin, prefix="/admin")
+app.include_router(healthcheck_router, prefix="/healthcheck", tags=["Healthcheck"])
+
 
 if __name__ == "__main__":
     import uvicorn

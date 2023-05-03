@@ -33,6 +33,8 @@ class Environment(str, Enum):
 class DatabaseSettings(BaseSettings):
     """Class to store the configuration of the database, it loads the environment variables with a prefix."""
 
+    __inscence = None
+
     url: str = "sqlite:///database.db"
     aut_create_models: bool = True
 
@@ -42,9 +44,17 @@ class DatabaseSettings(BaseSettings):
         env_prefix = "API_DB_"
         case_sensitive = False
 
+    def __new__(cls):
+        """Create a singleton."""
+        if DatabaseSettings.__inscence is None:
+            DatabaseSettings.__inscence = object.__new__(cls)
+        return DatabaseSettings.__inscence
+
 
 class RunnigeEnviroment(BaseSettings):
     """Class to store the enviroment of the API."""
+
+    __instance = None
 
     local: Environment = Environment.LOCAL
     jwt_key = generator.uuid()
@@ -54,6 +64,12 @@ class RunnigeEnviroment(BaseSettings):
 
         env_prefix = "API_"
         case_sensitive = False
+
+    def __new__(cls):
+        """Create a singleton."""
+        if RunnigeEnviroment.__instance is None:
+            RunnigeEnviroment.__instance = object.__new__(cls)
+        return RunnigeEnviroment.__instance
 
 
 env = RunnigeEnviroment()

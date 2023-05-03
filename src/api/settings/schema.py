@@ -10,6 +10,10 @@ class SettingsAPI(BaseModel):
     # Get Parameters
     get_max_page_size: int = 1000
     get_default_page_size: int = 100
+    endpoint_healthcheck_enabled: bool = True
+    endpoint_healthcheck_display_on_docs: bool = True
+    endpoint_version_enabled: bool = True
+    endpoint_version_display_on_docs: bool = True
 
     @root_validator
     def validate_get_max_page_size(cls, values):  # pylint: disable=E0213

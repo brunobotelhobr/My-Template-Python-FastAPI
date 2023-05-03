@@ -16,3 +16,17 @@ singletons, utils
 need password change?
 
 user http status for exceptions
+
+
+
+    get_max_page_size: int = 1000
+    get_default_page_size: int = 100
+
+autenticação via cookie
+docstring modules
+
+import toml  # type: ignore
+logouy "{\"status\": \"Sucessfully logged out.\"}"
+
+module and fuction docstrings
+from api.settings.router import settings

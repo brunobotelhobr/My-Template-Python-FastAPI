@@ -59,7 +59,7 @@ jose = "^1.0.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 
 [tool.pylint.BASIC]
-good-names = [ "a", "b", "c", "d", "e", "i", "k", "k", "l", "m", "n", "p", "u", "r", "s", "t", "v"]
+good-names = [ "a", "b", "c", "d", "e", "i", "k", "k", "l", "m", "n", "p", "q", "u", "r", "s", "t", "v"]
 
 [tool.taskipy.settings]
 use_vars = true
