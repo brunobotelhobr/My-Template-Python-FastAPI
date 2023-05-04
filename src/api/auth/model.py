@@ -1,10 +1,10 @@
 """Userauth model."""
 from sqlalchemy import Column, DateTime, String
 
-from api.database import Base
+from api.core.database import BaseModelORM
 
 
-class RevokedToken(Base):
+class RevokedTokenORM(BaseModelORM):
     """JWT Token Revoked Model."""
 
     __tablename__ = "revokedtokens"

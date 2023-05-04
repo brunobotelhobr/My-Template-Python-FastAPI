@@ -1,10 +1,10 @@
 """Settings model."""
 from sqlalchemy import Column, String
 
-from api.database import Base
+from api.core.database import BaseModelORM
 
 
-class SettingsORM(Base):
+class SettingsORM(BaseModelORM):
     """Stores the configuration on the database."""
 
     __tablename__ = "settings"

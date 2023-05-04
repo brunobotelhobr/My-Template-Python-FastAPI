@@ -1,14 +1,14 @@
 """Healthcheck router."""
 from datetime import datetime
 
+import toml
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-from toml import load  # type: ignore
 
 from api.auth.utils import authenticate
-from api.database import engine
+from api.core.database import engine
 from api.healthcheck.schema import Entity, HealthCheck
 from api.users.schema import UserOut
 
@@ -43,14 +43,14 @@ async def full_healthcheck(me: UserOut = Depends(authenticate)) -> HealthCheck:
         d["flavor"] = str(ispn.engine.name)
         d["dialect"] = str(ispn.engine.dialect.name)
         d["driver"] = str(ispn.engine.driver)
-        d["host"] = str(ispn.engine.url.host)
-        d["port"] = str(ispn.engine.url.port)
-        d["database"] = str(ispn.engine.url.database)
+        d["host"] = str(ispn.engine.database_connection_url.host)
+        d["port"] = str(ispn.engine.database_connection_url.port)
+        d["database"] = str(ispn.engine.database_connection_url.database)
         d["table count"] = str(len(ispn.get_table_names()))
 
     dbe = Entity(alias="database", status="ok", timeTaken=str(datetime.now() - lstart), details=d)
     start = datetime.now()
     d: dict[str, str] = {}  # type: ignore
-    d["name"] = load("pyproject.toml")["tool"]["poetry"]["name"]
-    d["version"] = load("pyproject.toml")["tool"]["poetry"]["version"]
+    d["name"] = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
+    d["version"] = toml.load("pyproject.toml")["tool"]["poetry"]["version"]
     return HealthCheck(status="ok", timeTaken=str(datetime.now() - start), details=d, entities=[dbe])

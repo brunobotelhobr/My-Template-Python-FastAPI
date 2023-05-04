@@ -1,10 +1,10 @@
 """User database model."""
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 
-from api.database import Base
+from api.core.database import BaseModelORM
 
 
-class UserORM(Base):
+class UserORM(BaseModelORM):
     """User database model."""
 
     __tablename__ = "users"
@@ -13,7 +13,6 @@ class UserORM(Base):
     key = Column(String(60), index=True, primary_key=True)
     name = Column(String(256), index=True, nullable=True)
     email = Column(String(256), index=True, unique=True)
-    salt = Column(String(8))
     active = Column(Boolean)
     blocked = Column(Boolean)
     verified = Column(Boolean, default=False)

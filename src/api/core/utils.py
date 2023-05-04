@@ -1,12 +1,14 @@
 """General API Utilities."""
-import hashlib
 import random
 import string
 from datetime import datetime
 from uuid import uuid4
 
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
-class RandonGenerator:
+
+class RandomGenerator:
     """Class to generate random values."""
 
     __instance = None
@@ -37,12 +39,6 @@ class RandonGenerator:
         Returns:
             str: Name.
 
-        Example:
-            >>> from api.utils import generator
-            >>> generator.name()
-            'John Doe Carl'
-            >>> generator.name(words=2, first_caps=False)
-            'john doe'
         """
         name = ""
         for _ in range(words):
@@ -69,15 +65,12 @@ class RandonGenerator:
         Returns:
             str: Password.
 
-        Example:
-            >>> from api.utils import generator
-            >>> generator.password()
-            '1@2a3B4c5D6e7F'
-
         """
         # check if the sum of the numbers, special, uper and lower is less than the size of the password
         if (numbers + special + uper + lower) > size:
-            raise ValueError("The sum of the numbers, special, uper and lower must be less than the size of the password.")
+            raise ValueError(
+                "The sum of the numbers, special, uper and lower must be less than the size of the password."
+            )
         # check if the numbers, special, uper and lower are greater than or equal to zero
         if numbers < 0 or special < 0 or uper < 0 or lower < 0:
             raise ValueError("The numbers, special, uper and lower must be greater than or equal to zero.")
@@ -110,19 +103,39 @@ class RandonGenerator:
 
         return p
 
-    def hasher(self, password: str, salt: str) -> str:
-        """Return a hashed password."""
-        return str(hashlib.sha256(password.encode() + salt.encode()).hexdigest())
-
     def now(self) -> datetime:
         """Return a datetime object."""
         return datetime.now()
 
     def __new__(cls):
         """Create a singleton."""
-        if RandonGenerator.__instance is None:
-            RandonGenerator.__instance = object.__new__(cls)
-        return RandonGenerator.__instance
+        if RandomGenerator.__instance is None:
+            RandomGenerator.__instance = object.__new__(cls)
+        return RandomGenerator.__instance
 
 
-generator = RandonGenerator()
+class HashHandler:
+    """Class to handle passords hashs."""
+
+    __instance = None
+
+    def generate_hash(self, password: str) -> str:
+        """Return a hashed password."""
+        return str(PasswordHasher().hash(password))
+
+    def verify_hash(self, password: str, hash: str) -> bool:
+        """Verify if the hash is valid."""
+        try:
+            return PasswordHasher().verify(hash=hash, password=password)
+        except VerifyMismatchError:
+            return False
+
+    def __new__(cls):
+        """Create a singleton."""
+        if HashHandler.__instance is None:
+            HashHandler.__instance = object.__new__(cls)
+        return HashHandler.__instance
+
+
+generator = RandomGenerator()
+hash_handler = HashHandler()

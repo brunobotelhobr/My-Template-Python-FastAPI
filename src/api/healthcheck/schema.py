@@ -17,4 +17,7 @@ class HealthCheck(BaseModel):
     status: str = Field(alias="status", example="Healthy")
     timeTaken: str = Field(alias="timeTaken", example="0:00:00.009619")
     details: dict[str, str] | None = Field(alias="details", example={"version": "1.0.0"})
-    entities: list[Entity] = Field(alias="entities", example=[Entity(alias="db", status="Healthy", timeTaken="0:00:00.009619", details={"version": "1.0.0"})])
+    entities: list[Entity] = Field(
+        alias="entities",
+        example=[Entity(alias="db", status="Healthy", timeTaken="0:00:00.009619", details={"version": "1.0.0"})],
+    )

@@ -30,7 +30,7 @@ class EnvironmentBehavior(str, Enum):
         return self in (self.STAGING, self.PRODUCTION)
 
 
-class DatabaseSettings(BaseSettings):
+class DatabaseEnvironment(BaseSettings):
     """Class to store the configuration of the database, it loads the environment variables with a prefix."""
 
     __instance = None
@@ -46,9 +46,9 @@ class DatabaseSettings(BaseSettings):
 
     def __new__(cls):
         """Create a singleton."""
-        if DatabaseSettings.__instance is None:
-            DatabaseSettings.__instance = object.__new__(cls)
-        return DatabaseSettings.__instance
+        if DatabaseEnvironment.__instance is None:
+            DatabaseEnvironment.__instance = object.__new__(cls)
+        return DatabaseEnvironment.__instance
 
 
 class RunnigeEnviroment(BaseSettings):
@@ -72,5 +72,5 @@ class RunnigeEnviroment(BaseSettings):
         return RunnigeEnviroment.__instance
 
 
-env = RunnigeEnviroment()
-db = DatabaseSettings()
+running_environment = RunnigeEnviroment()
+database_environment = DatabaseEnvironment()

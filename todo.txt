@@ -1,17 +1,11 @@
 LOGS,
-
-
+Cache
 test coverage
 test init Db 
-
-test 
-
 auth test
-token renew
-singletons, utils
 
-    get_max_page_size: int = 1000
-    get_default_page_size: int = 100
+hash insegutro
+
 rever settings e descriptions
 autenticação via cookie
 docstring modules

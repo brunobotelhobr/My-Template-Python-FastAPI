@@ -1,6 +1,5 @@
 """Auth Model."""
 from datetime import datetime, timedelta
-from time import process_time_ns
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -8,8 +7,9 @@ from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from api.auth.model import RevokedTokenORM
 from api.auth.schema import RevokedToken
-from api.database import engine, get_db
+from api.core.database import engine, get_database_session
 from api.settings.utils import global_settings
 from api.users.model import UserORM
 from api.users.schema import UserOut
@@ -31,7 +31,9 @@ class JWTFactory(BaseModel):
                 algorithms=global_settings.auth.jwt_algorithm,
             )
         except JWTError as e:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token.") from e
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token."
+            ) from e
         return data
 
     def __check_revoked(self, token: str) -> bool:
@@ -42,8 +44,10 @@ class JWTFactory(BaseModel):
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token.")
         if global_settings.auth.jwt_revokes_store == "database":
             with Session(engine) as session:
-                if session.query(RevokedToken).filter_by(token=token).first():
-                    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token.")
+                if session.query(RevokedTokenORM).filter(RevokedTokenORM.token == token).first():
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token."
+                    )
         if global_settings.auth.jwt_revokes_store == "cache":
             raise NotImplementedError
         return True
@@ -64,7 +68,7 @@ class JWTFactory(BaseModel):
 
     def verify(self, token: str):
         """Verify JWT."""
-        # Is it a Valit Tokern?
+        # Is it a Valit Token?
         data = self.__parce(token)
         # Is it expired?
         if datetime.utcfromtimestamp(float(data["exp"])) < datetime.utcnow():
@@ -92,8 +96,9 @@ class JWTFactory(BaseModel):
                 bad_tokens.append(RevokedToken(token=token, expiration=datetime.utcfromtimestamp(data["exp"])))
             if global_settings.auth.jwt_revokes_store == "database":
                 with Session(engine) as session:
-                    session.add(RevokedToken(token=token, expiration=datetime.utcfromtimestamp(data["exp"])))
+                    session.add(RevokedTokenORM(token=token, expiration=datetime.utcfromtimestamp(data["exp"])))
                     session.commit()
+                    print("salvei")
             if global_settings.auth.jwt_revokes_store == "cache":
                 raise NotImplementedError
         return True
@@ -128,10 +133,10 @@ class JWTFactory(BaseModel):
         return JWTFactory.__instance
 
 
-jwt_factory = JWTFactory()
-
-
-def authenticate(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/auth/login")), database: Session = Depends(get_db)) -> UserOut:
+def authenticate(
+    token: str = Depends(OAuth2PasswordBearer(tokenUrl="/auth/login")),
+    database: Session = Depends(get_database_session),
+) -> UserOut:
     """Authenticate user."""
     email = jwt_factory.verify(token)
     q = database.query(UserORM).filter(UserORM.email == email).first()
@@ -141,3 +146,6 @@ def authenticate(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/auth/login
     if u.blocked:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: User is blocked.")
     return u
+
+
+jwt_factory = JWTFactory()

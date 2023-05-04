@@ -4,7 +4,7 @@ import string
 import pytest
 from pytest import raises
 
-from api.utils import generator
+from api.core.utils import generator
 
 
 @pytest.mark.order(2)
@@ -23,7 +23,9 @@ def test_generator():
     assert generator.password() != generator.password()
     assert generator.uuid() != generator.uuid()
     assert generator.now() != generator.now()
-    assert generator.hasher(password=generator.password(), salt=generator.salt()) != generator.hasher(password=generator.password(), salt=generator.salt())
+    assert generator.hasher(password=generator.password(), salt=generator.salt()) != generator.hasher(
+        password=generator.password(), salt=generator.salt()
+    )
 
     # Test the password function, length
     assert len(generator.password(size=10)) == 10

@@ -1,9 +1,10 @@
+"""temp."""
 import unittest
 
 import pytest
 
+from api.core.utils import generator
 from api.settings.schema import SettingsAPI, SettingsModel
-from api.utils import generator
 
 
 @pytest.mark.order(2)

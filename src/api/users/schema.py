@@ -2,16 +2,17 @@
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field, validator
-from sqlalchemy import null
 
+from api.core.utils import generator
 from api.settings.utils import global_settings
-from api.utils import generator
 
 
 class Password(BaseModel):
     """User input model."""
 
-    password: str = Field(example="P@ssw0rd", title="Password", description="User password, it comply with the password policy.")
+    password: str = Field(
+        example="P@ssw0rd", title="Password", description="User password, it comply with the password policy."
+    )
 
     @validator("password")
     def passwords_match(cls, v):  # pylint: disable=E0213
@@ -54,12 +55,16 @@ class Password(BaseModel):
 
 
 class UserBase(BaseModel):
-    """User Base model."""
+    """User BaseModelORM model."""
 
     name: str = Field(
-        example="John Doe", title="Full name", description="User full name, it must contain a space character, bigger than 5 and smaller than 128 characters."
+        example="John Doe",
+        title="Full name",
+        description="User full name, it must contain a space character, bigger than 5 and smaller than 128 characters.",
     )
-    email: EmailStr = Field(example="john.doe@email.com", title="Email", description="It can be an email binded to another account.")
+    email: EmailStr = Field(
+        example="john.doe@email.com", title="Email", description="It can be an email binded to another account."
+    )
 
     @validator("name")
     def name_must_contain_space(cls, v):  # pylint: disable=E0213
@@ -90,12 +95,18 @@ class UserIn(UserBase, Password):
 class UserOut(UserBase):
     """User output model."""
 
-    key: str = Field(example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Key", description="User key, it is a unique identifier.")
+    key: str = Field(
+        example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+        title="Key",
+        description="User key, it is a unique identifier.",
+    )
     active: bool = Field(example=True, title="Active", description="User active status.")
     blocked: bool = Field(example=False, title="Blocked", description="User blocked status.")
     verified: bool = Field(example=False, title="Verified", description="User verified status.")
     password_strikes: int = Field(example=0, title="Password Strikes", description="User password strikes.")
-    password_birthday: datetime = Field(example="2021-01-01 00:00:00", title="Password Setting Date", description="User password setting date.")
+    password_birthday: datetime = Field(
+        example="2021-01-01 00:00:00", title="Password Setting Date", description="User password setting date."
+    )
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
@@ -107,19 +118,35 @@ class UserDB(UserBase):
     """User database model."""
 
     key: str = Field(
-        default=generator.uuid(), example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92", title="Key", description="User key, it is a unique identifier."
+        default=generator.uuid(),
+        example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+        title="Key",
+        description="User key, it is a unique identifier.",
     )
-    salt: str = Field(default=generator.salt(), example="12345678", title="Salt", description="User salt, it is used to hash the password.")
-    active: bool = Field(default=global_settings.users.default_active, example=True, title="Active", description="User active status.")
-    blocked: bool = Field(default=global_settings.users.default_blocked, example=False, title="Blocked", description="User blocked status.")
-    verified: bool = Field(default=global_settings.users.default_verified, example=False, title="Verified", description="User verified status.")
+    active: bool = Field(
+        default=global_settings.users.default_active, example=True, title="Active", description="User active status."
+    )
+    blocked: bool = Field(
+        default=global_settings.users.default_blocked,
+        example=False,
+        title="Blocked",
+        description="User blocked status.",
+    )
+    verified: bool = Field(
+        default=global_settings.users.default_verified,
+        example=False,
+        title="Verified",
+        description="User verified status.",
+    )
     password_hash: str = Field(
-        example="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+        example="argon2id$v=19$m=65536,t=3,p=4$sC2MrzQvIT5v0reVS4eK5A$bLBwdKS2uMME7MF9ln06cGrEtiLK294YtQz8t44wcKw",
         title="Password Hash",
-        description="User password sha256 hash, used to authenticate localy.",
+        description="User password hash, used to authenticate localy.",
     )
     password_strikes: int = Field(default=0, example=0, title="Password Strikes", description="User password strikes.")
-    password_birthday: datetime = Field(default=generator.now(), example="2021-01-01 00:00:00", title="Password Setting Date")
+    password_birthday: datetime = Field(
+        default=generator.now(), example="2021-01-01 00:00:00", title="Password Setting Date"
+    )
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""

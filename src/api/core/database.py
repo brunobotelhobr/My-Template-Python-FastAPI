@@ -2,16 +2,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from api.tools.environment import db, env
+from api.core.environment import database_environment, running_environment
 
 
 # Create the engine
 def create_local_engine():
     """Create the database engine."""
-    if db.url.startswith("sqlite"):
+    if database_environment.database_connection_url.startswith("sqlite"):
         connect_args = {"check_same_thread": False}
-        return create_engine(db.url, echo=env.local.is_debug, connect_args=connect_args)
-    return create_engine(db.url, echo=True)
+        return create_engine(
+            database_environment.database_connection_url,
+            echo=running_environment.local.is_debug,
+            connect_args=connect_args,
+        )
+    return create_engine(database_environment.database_connection_url, echo=running_environment.local.is_debug)
 
 
 # Spawn the engine
@@ -19,19 +23,19 @@ engine = create_local_engine()
 session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-class Base(DeclarativeBase):
-    """Base class for all the database models."""  # pylint: disable=too-few-public-methods
+class BaseModelORM(DeclarativeBase):
+    """BaseModelORM class for all the database models."""  # pylint: disable=too-few-public-methods
 
     pass  # pylint: disable=unnecessary-pass
 
 
-def init_db() -> bool:
+def initialize_database() -> bool:
     """Initialize the database."""
-    Base.metadata.create_all(bind=engine)
+    BaseModelORM.metadata.create_all(bind=engine)
     return True
 
 
-def get_db():
+def get_database_session():
     """Dependency to get a database session."""
     database = session()
     try:

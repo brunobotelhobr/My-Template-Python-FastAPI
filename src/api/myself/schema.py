@@ -7,13 +7,15 @@ from api.users.schema import Password
 class PasswordResetRequest(BaseModel):
     """Password reset request model."""
 
-    old: str = Field(example="Pa@ssw0rdOld", title="Old password", description="Your actual password")
-    new: Password
-    confirm: Password
+    password: str = Field(example="P@ssw0rd", title="Old password", description="Your actual password")
+    password_new: str = Field(example="P@ssw0rdNew", title="New password", description="Your new password")
+    password_confirm: str = Field(example="P@ssw0rdNew", title="Confirm password", description="Your new password")
 
     @root_validator
     def passwords_match(cls, values):  # pylint: disable=no-self-argument
         """Validate that the passwords match."""
-        if values["new"] != values["confirm"]:
+        if values["password_new"] != values["password_confirm"]:
             raise ValueError("New password and confirm password do not match")
+        # Validate Password Policy
+        Password(password=values["password_new"])
         return values

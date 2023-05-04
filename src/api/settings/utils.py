@@ -4,7 +4,7 @@ import json
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from api.database import engine
+from api.core.database import engine
 from api.settings.model import SettingsORM
 from api.settings.schema import SettingsModel
 

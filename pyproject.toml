@@ -19,14 +19,14 @@ from = "src"
 
 [tool.bandit]
 exclude_dirs = [ "tests",]
-skips = ["B104","B311"]
+skips = []
 
 [tool.black]
-line_length = 160
-ignore = "E203"
+line_length = 120
+ignore = ""
 
 [tool.isort]
-line_length = 160
+line_length = 120
 atomic = true
 profile = "black"
 skip_gitignore = true
@@ -35,8 +35,8 @@ skip_gitignore = true
 check = true
 
 [tool.flake8]
-max-line-length = 160
-ignore = [ "B008", "D100"]
+max-line-length = 120
+ignore = ["B008"]
 per-file-ignores = []
 count = true
 
@@ -45,8 +45,8 @@ warn_return_any = true
 ignore_missing_imports = true
 
 [tool.pylint]
-max-line-length = 160
-disable = [ "E0611", "R0903", "R0913", "C0114", "E1121"]
+max-line-length = 120
+disable = [ ]
 
 [tool.poetry.dependencies]
 python = ">3.10,<3.12"
@@ -57,9 +57,10 @@ sqlalchemy = "^2.0.10"
 python-multipart = "^0.0.6"
 jose = "^1.0.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+argon2-cffi = "^21.3.0"
 
 [tool.pylint.BASIC]
-good-names = [ "a", "b", "c", "d", "e", "i", "k", "k", "l", "m", "n", "p", "q", "u", "r", "s", "t", "v", "me"]
+good-names = [ ]
 
 [tool.taskipy.settings]
 use_vars = true
@@ -216,6 +217,7 @@ flake8-tidy-imports = "^4.8.0"
 taskipy = "^1.10.4"
 httpx = "^0.24.0"
 pytest-order = "^1.1.0"
+types-toml = "^0.10.8.6"
 
 
 [tool.poetry.group.docs.dependencies]
