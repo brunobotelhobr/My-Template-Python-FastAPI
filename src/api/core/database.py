@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from api.environment import db, env
+from api.tools.environment import db, env
 
 
 # Create the engine

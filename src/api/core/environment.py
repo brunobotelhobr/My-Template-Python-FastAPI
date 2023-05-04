@@ -3,10 +3,10 @@ from enum import Enum
 
 from pydantic import BaseSettings
 
-from api.utils import generator
+from api.core.utils import generator
 
 
-class Environment(str, Enum):
+class EnvironmentBehavior(str, Enum):
     """Supported environments and their properties."""
 
     LOCAL = "LOCAL"
@@ -33,9 +33,9 @@ class Environment(str, Enum):
 class DatabaseSettings(BaseSettings):
     """Class to store the configuration of the database, it loads the environment variables with a prefix."""
 
-    __inscence = None
+    __instance = None
 
-    url: str = "sqlite:///database.db"
+    database_connection_url: str = "sqlite:///database.db"
     aut_create_models: bool = True
 
     class Config:  # pylint: disable=too-few-public-methods
@@ -46,9 +46,9 @@ class DatabaseSettings(BaseSettings):
 
     def __new__(cls):
         """Create a singleton."""
-        if DatabaseSettings.__inscence is None:
-            DatabaseSettings.__inscence = object.__new__(cls)
-        return DatabaseSettings.__inscence
+        if DatabaseSettings.__instance is None:
+            DatabaseSettings.__instance = object.__new__(cls)
+        return DatabaseSettings.__instance
 
 
 class RunnigeEnviroment(BaseSettings):
@@ -56,8 +56,8 @@ class RunnigeEnviroment(BaseSettings):
 
     __instance = None
 
-    local: Environment = Environment.LOCAL
-    jwt_key = generator.uuid()
+    local: EnvironmentBehavior = EnvironmentBehavior.LOCAL
+    jwt_key: str = generator.uuid()
 
     class Config:  # pylint: disable=too-few-public-methods
         """Load environment variables with a prefix and make them case sensitive."""
