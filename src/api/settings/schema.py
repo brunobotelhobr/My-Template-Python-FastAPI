@@ -10,10 +10,14 @@ class SettingsAPI(BaseModel):
 
     # Get Parameters
     page_size_initial: int = Field(
-        default=100, title="Initial page size", description="Initial number of items returned in a single page."
+        default=100,
+        title="Initial page size",
+        description="Initial number of items returned in a single page.",
     )
     page_size_max: int = Field(
-        default=1000, title="Maximum page size", description="Maximum number of items returned in a single page."
+        default=1000,
+        title="Maximum page size",
+        description="Maximum number of items returned in a single page.",
     )
 
     @root_validator

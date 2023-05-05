@@ -1,4 +1,6 @@
 """User settings."""
+from typing import Literal
+
 from pydantic import BaseModel, Field, root_validator
 
 
@@ -11,10 +13,14 @@ class PasswordPolicy(BaseModel):
         default=True,
     )
     min_length: int = Field(
-        title="Minimum password length", description="Minimum number of characters in a password.", default=8
+        title="Minimum password length",
+        description="Minimum number of characters in a password.",
+        default=8,
     )
     max_length: int = Field(
-        title="Maximum password length", description="Maximum number of characters in a password.", default=64
+        title="Maximum password length",
+        description="Maximum number of characters in a password.",
+        default=64,
     )
     min_upper: int = Field(
         title="Minimum number of upper case characters",
@@ -27,7 +33,9 @@ class PasswordPolicy(BaseModel):
         default=1,
     )
     min_digits: int = Field(
-        title="Minimum number of digits", description="Minimum number of digits in a password.", default=1
+        title="Minimum number of digits",
+        description="Minimum number of digits in a password.",
+        default=1,
     )
     min_special: int = Field(
         title="Minimum number of special characters",
@@ -53,7 +61,10 @@ class PasswordPolicy(BaseModel):
         if properties["min_length"] > properties["max_length"]:
             raise ValueError("min_length must be less than or equal to max_length")
         if (
-            properties["min_upper"] + properties["min_lower"] + properties["min_digits"] + properties["min_special"]
+            properties["min_upper"]
+            + properties["min_lower"]
+            + properties["min_digits"]
+            + properties["min_special"]
         ) > properties["min_length"]:
             raise ValueError(
                 "min_length must be more or equal to the sum of min_upper, min_lower, min_digits and min_special"
@@ -62,7 +73,7 @@ class PasswordPolicy(BaseModel):
             raise ValueError("max_length must be less than or equal to 128")
         return properties
 
-    class Config:  # pylint: disable=too-few-public-methods
+    class Config:
         """Set orm_mode to True to allow returning ORM objects."""
 
         orm_mode = True
@@ -71,8 +82,14 @@ class PasswordPolicy(BaseModel):
 class SettingsUser(BaseModel):
     """User configuration model."""
 
+    login_with: Literal["username", "email"] = Field(
+        title="Login with", description="Login with username or email", default="username"
+    )
+
     allow_delete: bool = Field(
-        title="Allow users to be deleted, ", description="If not enables users can be only deactivated.", default=True
+        title="Allow users to be deleted, ",
+        description="If not enables users can be only deactivated.",
+        default=True,
     )
     allow_password_reset: bool = Field(
         title="Allow password reset to the actual password",
@@ -80,7 +97,9 @@ class SettingsUser(BaseModel):
         default=True,
     )
     default_active: bool = Field(
-        title="Default user active status", description="If disabled, users will be created as inactive.", default=True
+        title="Default user active status",
+        description="If disabled, users will be created as inactive.",
+        default=True,
     )
     default_verified: bool = Field(
         title="Default user verified status",
@@ -88,7 +107,9 @@ class SettingsUser(BaseModel):
         default=True,
     )
     default_blocked: bool = Field(
-        title="Default user blocked status", description="If enabled, users will be created as blocked.", default=False
+        title="Default user blocked status",
+        description="If enabled, users will be created as blocked.",
+        default=False,
     )
     block_user_on_password_strickes: bool = Field(
         title="Block user on password strickes",
@@ -101,17 +122,19 @@ class SettingsUser(BaseModel):
         default=3,
     )
     password_policy: PasswordPolicy = Field(
-        title="Password policy", description="Password policy to be applied to all users.", default=PasswordPolicy()
+        title="Password policy",
+        description="Password policy to be applied to all users.",
+        default=PasswordPolicy(),
     )
 
     @root_validator
-    def settings_user_validator(cls, properties):  # pylint: disable=E0213
+    def settings_user_validator(cls, properties):
         """Validate settings user."""
         if properties["password_strikes"] < 1:
             raise ValueError("password_strikes must be greater than or equal to 1")
         return properties
 
-    class Config:  # pylint: disable=too-few-public-methods
+    class Config:
         """Set orm_mode to True to allow returning ORM objects."""
 
         orm_mode = True

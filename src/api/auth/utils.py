@@ -32,7 +32,8 @@ class JWTFactory(BaseModel):
             )
         except JWTError as e:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token."
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authorized: Invalid token.",
             ) from e
         return data
 
@@ -40,13 +41,26 @@ class JWTFactory(BaseModel):
         """Check if token is revoked."""
         data = self.__parce(token)
         if global_settings.auth.jwt_revokes_store == "memory":
-            if RevokedToken(token=token, expiration=datetime.utcfromtimestamp(float(data["exp"]))) in bad_tokens:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token.")
+            if (
+                RevokedToken(
+                    token=token, expiration=datetime.utcfromtimestamp(float(data["exp"]))
+                )
+                in bad_tokens
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Not authorized: Invalid token.",
+                )
         if global_settings.auth.jwt_revokes_store == "database":
             with Session(engine) as session:
-                if session.query(RevokedTokenORM).filter(RevokedTokenORM.token == token).first():
+                if (
+                    session.query(RevokedTokenORM)
+                    .filter(RevokedTokenORM.token == token)
+                    .first()
+                ):
                     raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token."
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Not authorized: Invalid token.",
                     )
         if global_settings.auth.jwt_revokes_store == "cache":
             raise NotImplementedError
@@ -59,7 +73,8 @@ class JWTFactory(BaseModel):
                 {
                     "sub": email,
                     "iat": datetime.utcnow(),
-                    "exp": datetime.utcnow() + timedelta(minutes=global_settings.auth.jwt_expiration_initial),
+                    "exp": datetime.utcnow()
+                    + timedelta(minutes=global_settings.auth.jwt_expiration_initial),
                 },
                 key=global_settings.auth.jwt_key,
                 algorithm=global_settings.auth.jwt_algorithm,
@@ -72,13 +87,22 @@ class JWTFactory(BaseModel):
         data = self.__parce(token)
         # Is it expired?
         if datetime.utcfromtimestamp(float(data["exp"])) < datetime.utcnow():
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Token expired.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authorized: Token expired.",
+            )
         # Is it issued in the future?
         if datetime.utcfromtimestamp(float(data["iat"])) > datetime.utcnow():
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authorized: Invalid token.",
+            )
         # Is it assigned to a user?
         if data["sub"] is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Invalid token.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authorized: Invalid token.",
+            )
         # Is ir revoked?
         self.__check_revoked(token)
         return data["sub"]
@@ -93,10 +117,18 @@ class JWTFactory(BaseModel):
         # Add to bad tokens
         if self.__check_revoked(token):
             if global_settings.auth.jwt_revokes_store == "memory":
-                bad_tokens.append(RevokedToken(token=token, expiration=datetime.utcfromtimestamp(data["exp"])))
+                bad_tokens.append(
+                    RevokedToken(
+                        token=token, expiration=datetime.utcfromtimestamp(data["exp"])
+                    )
+                )
             if global_settings.auth.jwt_revokes_store == "database":
                 with Session(engine) as session:
-                    session.add(RevokedTokenORM(token=token, expiration=datetime.utcfromtimestamp(data["exp"])))
+                    session.add(
+                        RevokedTokenORM(
+                            token=token, expiration=datetime.utcfromtimestamp(data["exp"])
+                        )
+                    )
                     session.commit()
                     print("salvei")
             if global_settings.auth.jwt_revokes_store == "cache":
@@ -112,8 +144,12 @@ class JWTFactory(BaseModel):
         data = self.__parce(token)
         # Calculate new expiration
         old_expiration = datetime.utcfromtimestamp(float(data["exp"]))
-        new_expiration = old_expiration + timedelta(minutes=global_settings.auth.jwt_expiration_step)
-        max_expiration = datetime.utcnow() + timedelta(minutes=global_settings.auth.jwt_expiration_max)
+        new_expiration = old_expiration + timedelta(
+            minutes=global_settings.auth.jwt_expiration_step
+        )
+        max_expiration = datetime.utcnow() + timedelta(
+            minutes=global_settings.auth.jwt_expiration_max
+        )
         new_expiration = min(new_expiration, max_expiration)
         # Renew token
         return jwt.encode(
@@ -141,10 +177,16 @@ def authenticate(
     email = jwt_factory.verify(token)
     q = database.query(UserORM).filter(UserORM.email == email).first()
     if not q:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Bad credentials.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authorized: Bad credentials.",
+        )
     u = UserOut(**q.__dict__)  # type: ignore
     if u.blocked:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: User is blocked.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authorized: User is blocked.",
+        )
     return u
 
 

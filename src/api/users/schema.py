@@ -11,11 +11,13 @@ class Password(BaseModel):
     """User input model."""
 
     password: str = Field(
-        example="P@ssw0rd", title="Password", description="User password, it comply with the password policy."
+        example="P@ssw0rd",
+        title="Password",
+        description="User password, it comply with the password policy.",
     )
 
     @validator("password")
-    def passwords_match(cls, v):  # pylint: disable=E0213
+    def passwords_match(cls, v):
         """Validate password policy."""
         if global_settings.users.password_policy.active:
             min_length = global_settings.users.password_policy.min_length
@@ -33,11 +35,15 @@ class Password(BaseModel):
 
             if min_upper > 0:
                 if sum(1 for i in v if i.isupper()) < min_upper:
-                    raise ValueError(f"Password must have at least {min_upper} uppercase letters")
+                    raise ValueError(
+                        f"Password must have at least {min_upper} uppercase letters"
+                    )
 
             if min_lower > 0:
                 if sum(1 for i in v if i.islower()) < min_lower:
-                    raise ValueError(f"Password must have at least {min_lower} lowercase letters")
+                    raise ValueError(
+                        f"Password must have at least {min_lower} lowercase letters"
+                    )
 
             if min_digits > 0:
                 if sum(1 for i in v if i.isdigit()) < min_digits:
@@ -45,7 +51,9 @@ class Password(BaseModel):
 
             if min_special > 0:
                 if sum(1 for i in v if not i.isalnum()) < min_special:
-                    raise ValueError(f"Password must have at least {min_special} special characters")
+                    raise ValueError(
+                        f"Password must have at least {min_special} special characters"
+                    )
         return v
 
     class Config:
@@ -57,17 +65,30 @@ class Password(BaseModel):
 class UserBase(BaseModel):
     """User BaseModelORM model."""
 
+    username: str = Field(
+        example="johndoe",
+        title="Username",
+        description=(
+            "User username, it must be unique, bigger than 5 and smaller than 64 characters"
+            ", must not contain spaces."
+        ),
+    )
     name: str = Field(
         example="John Doe",
         title="Full name",
-        description="User full name, it must contain a space character, bigger than 5 and smaller than 128 characters.",
+        description=(
+            "User full name, it must contain a space character, bigger than 5 and smaller "
+            "than 128 characters."
+        ),
     )
     email: EmailStr = Field(
-        example="john.doe@email.com", title="Email", description="It can be an email binded to another account."
+        example="john.doe@email.com",
+        title="Email",
+        description="It can be an email binded to another account.",
     )
 
     @validator("name")
-    def name_must_contain_space(cls, v):  # pylint: disable=E0213
+    def name_must_contain_space(cls, v):
         """Validate property."""
         if " " not in v:
             raise ValueError("must contain a space")
@@ -76,6 +97,17 @@ class UserBase(BaseModel):
         if len(v) > 128:
             raise ValueError("length must be less than 128")
         return v.title()
+
+    @validator("username")
+    def username_must_contain_space(cls, v):
+        """Validate property."""
+        if " " in v:
+            raise ValueError("must not contain a space")
+        if len(v) < 5:
+            raise ValueError("length must be greater than 5")
+        if len(v) > 64:
+            raise ValueError("length must be less than 64")
+        return v.lower()
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
@@ -101,11 +133,19 @@ class UserOut(UserBase):
         description="User key, it is a unique identifier.",
     )
     active: bool = Field(example=True, title="Active", description="User active status.")
-    blocked: bool = Field(example=False, title="Blocked", description="User blocked status.")
-    verified: bool = Field(example=False, title="Verified", description="User verified status.")
-    password_strikes: int = Field(example=0, title="Password Strikes", description="User password strikes.")
+    blocked: bool = Field(
+        example=False, title="Blocked", description="User blocked status."
+    )
+    verified: bool = Field(
+        example=False, title="Verified", description="User verified status."
+    )
+    password_strikes: int = Field(
+        example=0, title="Password Strikes", description="User password strikes."
+    )
     password_birthday: datetime = Field(
-        example="2021-01-01 00:00:00", title="Password Setting Date", description="User password setting date."
+        example="2021-01-01 00:00:00",
+        title="Password Setting Date",
+        description="User password setting date.",
     )
 
     class Config:
@@ -124,7 +164,10 @@ class UserDB(UserBase):
         description="User key, it is a unique identifier.",
     )
     active: bool = Field(
-        default=global_settings.users.default_active, example=True, title="Active", description="User active status."
+        default=global_settings.users.default_active,
+        example=True,
+        title="Active",
+        description="User active status.",
     )
     blocked: bool = Field(
         default=global_settings.users.default_blocked,
@@ -143,9 +186,16 @@ class UserDB(UserBase):
         title="Password Hash",
         description="User password hash, used to authenticate localy.",
     )
-    password_strikes: int = Field(default=0, example=0, title="Password Strikes", description="User password strikes.")
+    password_strikes: int = Field(
+        default=0,
+        example=0,
+        title="Password Strikes",
+        description="User password strikes.",
+    )
     password_birthday: datetime = Field(
-        default=generator.now(), example="2021-01-01 00:00:00", title="Password Setting Date"
+        default=generator.now(),
+        example="2021-01-01 00:00:00",
+        title="Password Setting Date",
     )
 
     class Config:

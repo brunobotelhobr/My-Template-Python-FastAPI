@@ -49,7 +49,9 @@ class RandomGenerator:
             name += " "
         return name[:-1]
 
-    def password(self, size: int = 12, numbers: int = 1, special: int = 1, uper: int = 1, lower=1) -> str:
+    def password(
+        self, size: int = 12, numbers: int = 1, special: int = 1, uper: int = 1, lower=1
+    ) -> str:
         """
         Summary.
 
@@ -73,7 +75,9 @@ class RandomGenerator:
             )
         # check if the numbers, special, uper and lower are greater than or equal to zero
         if numbers < 0 or special < 0 or uper < 0 or lower < 0:
-            raise ValueError("The numbers, special, uper and lower must be greater than or equal to zero.")
+            raise ValueError(
+                "The numbers, special, uper and lower must be greater than or equal to zero."
+            )
 
         char_set = ""
         p = ""

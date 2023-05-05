@@ -1,7 +1,11 @@
 """temp."""
 import pytest
 
-from api.core.environment import DatabaseEnvironment, EnvironmentBehavior, RunnigeEnviroment
+from api.core.environment import (
+    DatabaseEnvironment,
+    EnvironmentBehavior,
+    RunnigeEnviroment,
+)
 
 
 @pytest.mark.order(2)
@@ -14,7 +18,9 @@ from api.core.environment import DatabaseEnvironment, EnvironmentBehavior, Runni
         (EnvironmentBehavior.PRODUCTION, False, False, True),
     ],
 )
-def test_is_debug_testing_deployed(env, expected_debug, expected_testing, expected_deployed):
+def test_is_debug_testing_deployed(
+    env, expected_debug, expected_testing, expected_deployed
+):
     """Test the is_debug, is_testing and is_deployed properties of the EnvironmentBehavior enum."""
     assert env.is_debug == expected_debug
     assert env.is_testing == expected_testing

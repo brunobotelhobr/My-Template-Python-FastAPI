@@ -22,21 +22,28 @@ exclude_dirs = [ "tests",]
 skips = []
 
 [tool.black]
-line_length = 120
+line_length = 90
 ignore = ""
 
 [tool.isort]
+# https://github.com/PyCQA/isort/wiki/isort-Settings
 line_length = 120
 atomic = true
 profile = "black"
 skip_gitignore = true
+known_first_party = [
+    "api",
+    "test",
+]
 
 [tool.autoflake]
 check = true
 
 [tool.flake8]
 max-line-length = 120
-ignore = ["B008"]
+ignore = [
+    "W503", # Update PEP8, now binary operators should come first.
+    ]
 per-file-ignores = []
 count = true
 
@@ -47,6 +54,11 @@ ignore_missing_imports = true
 [tool.pylint]
 max-line-length = 120
 disable = [ ]
+load-plugins = [
+    "pylint_pytest",
+    "pylint_pydantic",
+]
+extension-pkg-whitelist = "pydantic"
 
 [tool.poetry.dependencies]
 python = ">3.10,<3.12"
@@ -58,6 +70,7 @@ python-multipart = "^0.0.6"
 jose = "^1.0.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 argon2-cffi = "^21.3.0"
+
 
 [tool.pylint.BASIC]
 good-names = [ ]
@@ -218,6 +231,8 @@ taskipy = "^1.10.4"
 httpx = "^0.24.0"
 pytest-order = "^1.1.0"
 types-toml = "^0.10.8.6"
+pylint-pydantic = "^0.1.8"
+pylint-pytest = "^1.1.2"
 
 
 [tool.poetry.group.docs.dependencies]

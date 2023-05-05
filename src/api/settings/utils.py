@@ -13,7 +13,11 @@ def save(settings: SettingsModel) -> bool:
     """Save the configuration to the database."""
     with Session(engine) as session:
         with Session(engine) as session:
-            s = session.query(SettingsORM).filter(SettingsORM.name == settings.name).first()
+            s = (
+                session.query(SettingsORM)
+                .filter(SettingsORM.name == settings.name)
+                .first()
+            )
             if s:
                 s.name = settings.name  # type: ignore
                 s.data = str(settings.json())  # type: ignore
@@ -53,4 +57,4 @@ def reset(settings: SettingsModel) -> bool:
         return True
 
 
-global_settings = SettingsModel(name="global")
+global_settings = SettingsModel()

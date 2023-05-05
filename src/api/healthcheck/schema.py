@@ -19,5 +19,12 @@ class HealthCheck(BaseModel):
     details: dict[str, str] | None = Field(alias="details", example={"version": "1.0.0"})
     entities: list[Entity] = Field(
         alias="entities",
-        example=[Entity(alias="db", status="Healthy", timeTaken="0:00:00.009619", details={"version": "1.0.0"})],
+        example=[
+            Entity(
+                alias="db",
+                status="Healthy",
+                timeTaken="0:00:00.009619",
+                details={"version": "1.0.0"},
+            )
+        ],
     )

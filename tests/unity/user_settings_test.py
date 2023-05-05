@@ -48,7 +48,9 @@ def test_password_policy():
 
     # Validate min_length < sum of min_upper, min_lower, min_digits and min_special
     with pytest.raises(ValidationError):
-        PasswordPolicy(min_length=3, min_upper=1, min_lower=1, min_digits=1, min_special=1)
+        PasswordPolicy(
+            min_length=3, min_upper=1, min_lower=1, min_digits=1, min_special=1
+        )
 
     # Validate max_length > 128
     with pytest.raises(ValidationError):

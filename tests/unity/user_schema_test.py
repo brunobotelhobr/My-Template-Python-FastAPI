@@ -94,23 +94,47 @@ def test_user_password():
 
     # Test Size
     with pytest.raises(ValidationError):
-        UserIn(name=generator.name(), email=generator.email(), password=generator.password(size=s.min_length - 1))
+        UserIn(
+            name=generator.name(),
+            email=generator.email(),
+            password=generator.password(size=s.min_length - 1),
+        )
 
     with pytest.raises(ValidationError):
-        UserIn(name=generator.name(), email=generator.email(), password=generator.password(size=s.max_length + 1))
+        UserIn(
+            name=generator.name(),
+            email=generator.email(),
+            password=generator.password(size=s.max_length + 1),
+        )
 
     # Test Password Requirements
     with pytest.raises(ValidationError):
-        UserIn(name=generator.name(), email=generator.email(), password=generator.password(lower=0))
+        UserIn(
+            name=generator.name(),
+            email=generator.email(),
+            password=generator.password(lower=0),
+        )
 
     with pytest.raises(ValidationError):
-        UserIn(name=generator.name(), email=generator.email(), password=generator.password(uper=0))
+        UserIn(
+            name=generator.name(),
+            email=generator.email(),
+            password=generator.password(uper=0),
+        )
 
     with pytest.raises(ValidationError):
-        UserIn(name=generator.name(), email=generator.email(), password=generator.password(special=0))
+        UserIn(
+            name=generator.name(),
+            email=generator.email(),
+            password=generator.password(special=0),
+        )
 
     with pytest.raises(ValidationError):
-        UserIn(name=generator.name(), email=generator.email(), password=generator.password(numbers=0))
+        UserIn(
+            name=generator.name(),
+            email=generator.email(),
+            password=generator.password(numbers=0),
+        )
 
     # Disable requirements
     s.active = False

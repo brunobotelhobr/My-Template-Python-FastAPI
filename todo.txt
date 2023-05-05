@@ -25,3 +25,18 @@ uSER sETTINGS:
     #     description="If enabled, users will be created with a password reset flag.",
     #     default=False,
     # )
+login wiuth email or password: "login_with": "username",
+user verification
+need password reset?
+
+    pylint.extensions.check_elif,
+    pylint.extensions.bad_builtin,
+    pylint.extensions.docparams,
+    pylint.extensions.for_any_all,
+    pylint.extensions.set_membership,
+    pylint.extensions.code_style,
+    pylint.extensions.overlapping_exceptions,
+    pylint.extensions.typing,
+    pylint.extensions.redefined_variable_type,
+    pylint.extensions.comparison_placement,
+    pylint.extensions.mccabe,

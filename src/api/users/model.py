@@ -10,8 +10,9 @@ class UserORM(BaseModelORM):
     __tablename__ = "users"
     __table_args__ = {"extend_existing": True}
 
-    key = Column(String(60), index=True, primary_key=True)
-    name = Column(String(256), index=True, nullable=True)
+    key = Column(String(64), index=True, primary_key=True)
+    name = Column(String(128), index=True, nullable=True)
+    username = Column(String(64), index=True, unique=True)
     email = Column(String(256), index=True, unique=True)
     active = Column(Boolean)
     blocked = Column(Boolean)

@@ -20,7 +20,9 @@ def myself(who: UserOut = Depends(authenticate)) -> UserOut:
     return who
 
 
-@router.post("/password-reset", status_code=status.HTTP_200_OK, response_model=SimpleMessage)
+@router.post(
+    "/password-reset", status_code=status.HTTP_200_OK, response_model=SimpleMessage
+)
 def password_reset(
     password_requet: PasswordResetRequest,
     who: UserOut = Depends(authenticate),
@@ -31,11 +33,21 @@ def password_reset(
         user_db_query = session.query(UserORM).filter(UserORM.email == who.email).first()
         user_db = UserDB(**user_db_query.__dict__)
         # Check if the old password is correct
-        if hash_handler.verify_hash(password=password_requet.password, hash=user_db.password_hash) is False:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authorized: Bad credentials.")
+        if (
+            hash_handler.verify_hash(
+                password=password_requet.password, hash=user_db.password_hash
+            )
+            is False
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authorized: Bad credentials.",
+            )
         # Check if the new password is the same as the old one
         if global_settings.users.allow_password_reset:
-            if hash_handler.verify_hash(password=password_requet.password_new, hash=user_db.password_hash):
+            if hash_handler.verify_hash(
+                password=password_requet.password_new, hash=user_db.password_hash
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="New password cannot be the same as the old one.",

@@ -15,7 +15,10 @@ def create_local_engine():
             echo=running_environment.local.is_debug,
             connect_args=connect_args,
         )
-    return create_engine(database_environment.database_connection_url, echo=running_environment.local.is_debug)
+    return create_engine(
+        database_environment.database_connection_url,
+        echo=running_environment.local.is_debug,
+    )
 
 
 # Spawn the engine
