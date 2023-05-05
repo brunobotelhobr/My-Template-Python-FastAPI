@@ -17,63 +17,63 @@ from api.core.dependencies import Database
 router = APIRouter()
 
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)
-def login(
-    form: OAuth2PasswordRequestFormStrict = Depends(),
-    database: Database,
-):
-    """Check if user exists and return JWT."""
-    # Validate Received Data
-    try:
-        credetials = AuthRequest(email=form.username, password=form.password)  # type: ignore
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Bad request: Invalid credentials.",
-        ) from error
-    # User Exists?
-    user_db_query = (
-        database.query(UserORM).filter(UserORM.email == credetials.username).first()
-    )
-    if not user_db_query:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized: Bad credentials.",
-        )
-    # Password is correct?
-    user_db = UserDB(**user_db_query.__dict__)  # type: ignore
-    if (
-        hash_handler.verify_hash(password=credetials.password, hash=user_db.password_hash)
-        is False
-    ):
-        # Update password attempts count.
-        user_db_query.password_strikes += 1  # type: ignore
-        if global_settings.auth.block_user_after_fail_attempts > 0:
-            if (
-                user_db_query.password_strikes
-                >= global_settings.auth.block_user_after_fail_attempts
-            ):
-                user_db_query.blocked = True  # type: ignore
-        database.add(user_db_query)
-        database.commit()
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized: Bad credentials.",
-        )
-    # User is blocked?
-    if user_db.blocked:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized: User is blocked.",
-        )
-    # Reset password attempts count.
-    if user_db.password_strikes > 0:
-        user_db_query.password_strikes = 0  # type: ignore
-        database.add(user_db_query)
-        database.commit()
-    # Generate JWT.
-    t = jwt_factory.create(user_db.email)
-    return {"token_type": "bearer", "access_token": t}
+# @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)
+# def login(
+#     form: OAuth2PasswordRequestFormStrict = Depends(),
+#     database: Database,
+# ):
+#     """Check if user exists and return JWT."""
+#     # Validate Received Data
+#     try:
+#         credetials = AuthRequest(email=form.username, password=form.password)  # type: ignore
+#     except ValueError as error:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Bad request: Invalid credentials.",
+#         ) from error
+#     # User Exists?
+#     user_db_query = (
+#         database.query(UserORM).filter(UserORM.email == credetials.username).first()
+#     )
+#     if not user_db_query:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Not authorized: Bad credentials.",
+#         )
+#     # Password is correct?
+#     user_db = UserDB(**user_db_query.__dict__)  # type: ignore
+#     if (
+#         hash_handler.verify_hash(password=credetials.password, hash=user_db.password_hash)
+#         is False
+#     ):
+#         # Update password attempts count.
+#         user_db_query.password_strikes += 1  # type: ignore
+#         if global_settings.auth.block_user_after_fail_attempts > 0:
+#             if (
+#                 user_db_query.password_strikes
+#                 >= global_settings.auth.block_user_after_fail_attempts
+#             ):
+#                 user_db_query.blocked = True  # type: ignore
+#         database.add(user_db_query)
+#         database.commit()
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Not authorized: Bad credentials.",
+#         )
+#     # User is blocked?
+#     if user_db.blocked:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Not authorized: User is blocked.",
+#         )
+#     # Reset password attempts count.
+#     if user_db.password_strikes > 0:
+#         user_db_query.password_strikes = 0  # type: ignore
+#         database.add(user_db_query)
+#         database.commit()
+#     # Generate JWT.
+#     t = jwt_factory.create(user_db.email)
+#     return {"token_type": "bearer", "access_token": t}
 
 
 @router.get("/renew", status_code=status.HTTP_200_OK, response_model=Token)

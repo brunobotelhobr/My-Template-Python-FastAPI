@@ -24,8 +24,8 @@ def get_users(
     """Get a list of users."""
     return (
         database.query(UserORM)
-        .offset(query_parameters['skip'])
-        .limit(query_parameters['limit'])
+        .offset(query_parameters["skip"])
+        .limit(query_parameters["limit"])
         .all()
     )
 

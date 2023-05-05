@@ -1,7 +1,7 @@
 """General API dependencies."""
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Query, RawParams
 from pydantic import BaseModel, root_validator
 from sqlalchemy.orm import Session
 
@@ -28,9 +28,15 @@ def get_settings():
 class CommonQueryParameters(BaseModel):
     """Common query parameters schema."""
 
-    skip: int | None = 0
-    limit: int | None = 100
+    skip: int | None = Query(0, title="Page number", description="Page number")
+    limit: int | None = Query(1000, title="Page size", description="Page size")
 
+    def to_raw_params(self) -> RawParams:
+        return RawParams(
+            limit=self.size,
+            offset=self.size * (self.page - 1),
+        )
+    
     @root_validator
     def validate_skip(cls, values):
         """Validate skip parameter."""

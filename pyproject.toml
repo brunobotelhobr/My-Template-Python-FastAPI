@@ -53,7 +53,9 @@ ignore_missing_imports = true
 
 [tool.pylint]
 max-line-length = 120
-disable = [ ]
+disable = [ 
+    "E0213",  # Pydantic Validator error
+]
 load-plugins = [
     "pylint_pytest",
     "pylint_pydantic",
