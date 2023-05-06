@@ -59,6 +59,7 @@ disable = [
 load-plugins = [
     "pylint_pytest",
     "pylint_pydantic",
+    "sqlalchemy.ext.mypy.plugin"
 ]
 extension-pkg-whitelist = "pydantic"
 
@@ -235,6 +236,7 @@ pytest-order = "^1.1.0"
 types-toml = "^0.10.8.6"
 pylint-pydantic = "^0.1.8"
 pylint-pytest = "^1.1.2"
+sqlalchemy = {extras = ["mypy"], version = "^2.0.12"}
 
 
 [tool.poetry.group.docs.dependencies]

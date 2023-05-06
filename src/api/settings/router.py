@@ -1,32 +1,38 @@
 """Settings router."""
 from fastapi import APIRouter, status
 
-from api.settings.schema import SettingsModel
-from api.settings.utils import global_settings, load, reset, save
+from api.core.dependencies import Settings
+from api.settings.schema import SettingsGlobal
+from 
 
 router = APIRouter()
 
 
-@router.get("/", response_model=SettingsModel, status_code=status.HTTP_200_OK)
-async def get_settings(name: str = "global"):
+@router.get("/", response_model=SettingsGlobal, status_code=status.HTTP_200_OK)
+async def get_settings(
+    settings: Settings
+):
     """Get the application settings."""
-    s = SettingsModel(name=name)
-    load(s)
-    return s
+    return settings
 
 
-@router.patch("/", response_model=SettingsModel, status_code=status.HTTP_200_OK)
-async def update_settings(name: str = "global", s: SettingsModel = global_settings):
+@router.patch("/", response_model=SettingsGlobal, status_code=status.HTTP_200_OK)
+async def update_settings(
+    settings: Settings,
+    settings_in: SettingsGlobal):
     """Update the application settings."""
-    if s.name != name:
-        s.name = name
-    save(settings=s)
-    return s
+    for item, value in settings_in.dict().items():
+        setattr(settings, item, value)
+        settings.save()
+    return settings
 
 
-@router.put("/", response_model=SettingsModel, status_code=status.HTTP_200_OK)
-async def reset_settings(name: str = "global"):
+@router.put("/", response_model=SettingsGlobal, status_code=status.HTTP_200_OK)
+async def reset_settings(
+    settings: Settings,
+):
     """Reset the application settings."""
-    s = SettingsModel(name=name)
-    reset(settings=s)
-    return s
+    new_settings = SettingsGlobal()
+    new_settings.save()
+    settings = new_settings
+    return settings

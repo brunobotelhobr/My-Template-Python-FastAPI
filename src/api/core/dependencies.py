@@ -8,9 +8,7 @@ from sqlalchemy.orm import Session
 
 from api.core.database import BaseModelORM, session
 from api.core.utils import HashHandler, RandomGenerator
-from api.settings.schema import SettingsModel
-from api.settings.utils import global_settings
-from api.users.model import UserORM
+from api.settings.schema import SettingsGlobal
 from api.users.schema import UserOut
 
 
@@ -25,7 +23,10 @@ def get_database_session():
 
 def get_settings():
     """Dependency to get global settings."""
-    return global_settings
+    settings = SettingsGlobal()
+    if settings.load() is False:
+        settings.save()
+    return settings
 
 
 class QueryBase(BaseModel):
@@ -81,7 +82,7 @@ def query_executor(orm_model, query: QueryBase, model):
 
 
 Database = Annotated[Session, Depends(get_database_session)]
-Settings = Annotated[SettingsModel, Depends(get_settings)]
+Settings = Annotated[SettingsGlobal, Depends(get_settings)]
 QueryParameters = Annotated[QueryBase, Depends()]
 HashManager = Annotated[HashHandler, Depends()]
 Generator = Annotated[RandomGenerator, Depends()]
