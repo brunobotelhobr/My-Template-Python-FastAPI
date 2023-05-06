@@ -32,8 +32,9 @@ class BaseModelORM(DeclarativeBase):
     pass  # pylint: disable=unnecessary-pass
 
 
-def initialize_database() -> bool:
-    """Initialize the database."""
+def reset_database() -> bool:
+    """Reset the database."""
+    BaseModelORM.metadata.drop_all(bind=engine)
     BaseModelORM.metadata.create_all(bind=engine)
     return True
 

@@ -4,7 +4,7 @@ from fastapi import APIRouter, FastAPI
 from api.about.router import router as about_router
 from api.auth.router import router as auth_router
 from api.core.constants import app_start_parameters
-from api.core.database import engine, initialize_database
+from api.core.database import engine, reset_database
 from api.core.environment import database_environment, running_environment
 from api.healthcheck.router import router as healthcheck_router
 from api.myself.router import router as myself_router
@@ -27,7 +27,8 @@ async def startup() -> None:
         raise ValueError("Database settings not initialized")
     # Initialize database, if debug mode is enabled
     if running_environment.local.is_debug:
-        initialize_database()
+        if reset_database() is False:
+            raise ValueError("Database reset failed")
     # initialize settings
     if load(global_settings) is False:
         save(global_settings)
