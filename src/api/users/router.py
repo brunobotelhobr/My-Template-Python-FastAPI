@@ -78,8 +78,8 @@ def update_user(user_in: UserBase, key: str, database: Database):
     if user_from_database is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
     # Update user.
-    for property, value in user_in.dict(exclude_unset=True).items():
-        setattr(user_from_database, property, value)
+    for item, value in user_in.dict(exclude_unset=True).items():
+        setattr(user_from_database, item, value)
     database.commit()
     return user_from_database
 

@@ -79,7 +79,7 @@ class PasswordPolicy(BaseModel):
         orm_mode = True
 
 
-class SettingsUser(BaseModel):
+class UserSettings(BaseModel):
     """User configuration model."""
 
     login_with: Literal["username", "email"] = Field(

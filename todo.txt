@@ -28,6 +28,8 @@ uSER sETTINGS:
 login wiuth email or password: "login_with": "username",
 user verification
 need password reset?
+filtros por propiedade?
+ordenaçao de query?
 
     pylint.extensions.check_elif,
     pylint.extensions.bad_builtin,

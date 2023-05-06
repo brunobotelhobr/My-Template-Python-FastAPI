@@ -132,7 +132,6 @@ class UserOut(UserBase):
         title="Key",
         description="User key, it is a unique identifier.",
     )
-    active: bool = Field(example=True, title="Active", description="User active status.")
     blocked: bool = Field(
         example=False, title="Blocked", description="User blocked status."
     )
@@ -162,12 +161,6 @@ class UserDB(UserBase):
         example="280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
         title="Key",
         description="User key, it is a unique identifier.",
-    )
-    active: bool = Field(
-        default=global_settings.users.default_active,
-        example=True,
-        title="Active",
-        description="User active status.",
     )
     blocked: bool = Field(
         default=global_settings.users.default_blocked,

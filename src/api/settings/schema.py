@@ -2,7 +2,7 @@
 from pydantic import BaseModel, Field, root_validator
 
 from api.auth.settings import SettingsAuth
-from api.users.settings import SettingsUser
+from api.users.settings import UserSettings
 
 
 class SettingsAPI(BaseModel):
@@ -43,7 +43,7 @@ class SettingsModel(BaseModel):
     name: str = "global"
     api: SettingsAPI = SettingsAPI()
     auth: SettingsAuth = SettingsAuth()
-    users: SettingsUser = SettingsUser()
+    users: UserSettings = UserSettings()
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""

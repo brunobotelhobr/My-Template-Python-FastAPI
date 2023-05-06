@@ -1,8 +1,9 @@
 """General API dependencies."""
+from math import ceil
 from typing import Annotated, Any, List
 
 from fastapi import Depends, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from api.core.database import BaseModelORM, session
@@ -65,7 +66,7 @@ def query_executor(orm_model, query: QueryBase, model):
     # Run Query
     with session() as database:
         total_records = database.query(orm_model).count()
-        total_pages = 1 + (total_records // query.records)
+        total_pages = ceil(total_records / query.records)
         records_database = (
             database.query(orm_model).offset((query.page) - 1).limit(query.records).all()
         )
