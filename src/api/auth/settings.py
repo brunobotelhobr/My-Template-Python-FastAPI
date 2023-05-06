@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, root_validator
 from api.core.environment import running_environment
 
 
-class SettingsAuth(BaseModel):
+class AuthSettings(BaseModel):
     """Settings model."""
 
     jwt_key: str = Field(

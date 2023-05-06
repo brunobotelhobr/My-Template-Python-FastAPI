@@ -3,13 +3,13 @@ import json
 
 from pydantic import BaseModel, Field
 
-from api.auth.settings import SettingsAuth
+from api.auth.settings import AuthSettings
 from api.core.database import session
 from api.settings.model import SettingsORM
 from api.users.settings import UserSettings
 
 
-class SettingsAPI(BaseModel):
+class APISettings(BaseModel):
     """General API configuration."""
 
     # Get Parameters
@@ -35,8 +35,10 @@ class SettingsAPI(BaseModel):
 class SettingsGlobal(BaseModel):
     """Application configuration model."""
 
-    api: SettingsAPI = SettingsAPI()
-    auth: SettingsAuth = SettingsAuth()
+    __instance = None
+
+    api: APISettings = APISettings()
+    auth: AuthSettings = AuthSettings()
     users: UserSettings = UserSettings()
 
     def save(self) -> bool:
@@ -65,7 +67,7 @@ class SettingsGlobal(BaseModel):
             )
             # If the settings exist, load them
             if settings_database:
-                loaded = json.loads(str(s.data))
+                loaded = json.loads(str(settings_database.data))
                 for key, value in loaded.items():
                     if hasattr(self, key):
                         orm_model = self.__fields__[key].type_
@@ -86,7 +88,18 @@ class SettingsGlobal(BaseModel):
                 return False
             database.delete(settings_database)
             database.commit()
+            self.api = APISettings()
+            self.auth = AuthSettings()
+            self.users = UserSettings()
+            self.save()
             return True
+
+    def __new__(cls, *args, **kwargs):
+        """Create a singleton instance of the settings."""
+        if not cls.__instance:
+            cls.__instance = super(SettingsGlobal, cls).__new__(cls, *args, **kwargs)
+            cls.__instance.load()
+        return cls.__instance
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
