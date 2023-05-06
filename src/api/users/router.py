@@ -1,14 +1,14 @@
 """User router."""
-from typing import List
-
 from fastapi import APIRouter, HTTPException, status
 
 from api.core.dependencies import (
     Database,
     Generator,
     HashManager,
+    PageUserOut,
     QueryParameters,
     Settings,
+    query_executor,
 )
 from api.users.model import UserORM
 from api.users.schema import UserBase, UserDB, UserIn, UserOut
@@ -16,18 +16,12 @@ from api.users.schema import UserBase, UserDB, UserIn, UserOut
 router = APIRouter()
 
 
-@router.get("/", response_model=List[UserOut], status_code=status.HTTP_200_OK)
+@router.get("/", response_model=PageUserOut, status_code=status.HTTP_200_OK)
 def get_users(
-    database: Database,
-    query_parameters: QueryParameters,
+    query: QueryParameters,
 ):
     """Get a list of users."""
-    return (
-        database.query(UserORM)
-        .offset(query_parameters["skip"])
-        .limit(query_parameters["limit"])
-        .all()
-    )
+    return query_executor(orm_model=UserORM, query=query, model=UserDB)
 
 
 @router.get("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)

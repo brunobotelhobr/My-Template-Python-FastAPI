@@ -7,12 +7,12 @@ from sqlalchemy.orm import Session
 from api.auth.schema import AuthRequest, Token
 from api.auth.utils import authenticate, jwt_factory  # type: ignore
 from api.core.database import get_database_session
+from api.core.dependencies import Database
 from api.core.schema import SimpleMessage
 from api.core.utils import hash_handler
 from api.settings.router import global_settings
 from api.users.model import UserORM
 from api.users.schema import UserDB, UserOut
-from api.core.dependencies import Database
 
 router = APIRouter()
 

@@ -41,11 +41,13 @@ async def shutdown() -> None:
 
 
 # Assigning endpoints
-app.include_router(about_router, prefix="/about", tags=["About"])
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(myself_router, prefix="/myself", tags=["Myself"])
+app.include_router(prefix="/about", tags=["About"], router=about_router)
+app.include_router(prefix="/auth", tags=["Auth"], router=auth_router)
+app.include_router(prefix="/myself", tags=["Myself"], router=myself_router)
+
 admin = APIRouter(tags=["Admin"])
-admin.include_router(user_router, prefix="/users")
-admin.include_router(settings_router, prefix="/settings")
-app.include_router(admin, prefix="/admin")
-app.include_router(healthcheck_router, prefix="/healthcheck", tags=["Healthcheck"])
+admin.include_router(prefix="/users", router=user_router)
+admin.include_router(prefix="/settings", router=settings_router)
+
+app.include_router(prefix="/admin", router=admin)
+app.include_router(prefix="/healthcheck", tags=["Healthcheck"], router=healthcheck_router)

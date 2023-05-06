@@ -1,14 +1,16 @@
 """General API dependencies."""
-from typing import Annotated
+from typing import Annotated, Any, List
 
-from fastapi import Depends, Query, RawParams
-from pydantic import BaseModel, root_validator
+from fastapi import Depends, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from api.core.database import session
+from api.core.database import BaseModelORM, session
 from api.core.utils import HashHandler, RandomGenerator
 from api.settings.schema import SettingsModel
 from api.settings.utils import global_settings
+from api.users.model import UserORM
+from api.users.schema import UserOut
 
 
 def get_database_session():
@@ -25,32 +27,60 @@ def get_settings():
     return global_settings
 
 
-class CommonQueryParameters(BaseModel):
+class QueryBase(BaseModel):
     """Common query parameters schema."""
 
-    skip: int | None = Query(0, title="Page number", description="Page number")
-    limit: int | None = Query(1000, title="Page size", description="Page size")
+    page: int | None = Query(
+        default=1, title="Page number", description="Page number to return.", gt=0
+    )
+    records: int | None = Query(
+        default=100,
+        title="Records per page",
+        description="Number of records to return.",
+        gt=0,
+        le=get_settings().api.page_size_max,
+    )
 
-    def to_raw_params(self) -> RawParams:
-        return RawParams(
-            limit=self.size,
-            offset=self.size * (self.page - 1),
+
+class PageBase(BaseModel):
+    """Page Base Model"""
+
+    records: List[Any]
+    query: QueryBase
+    total_pages: int
+    total_records: int
+
+
+class PageUserOut(PageBase):
+    """Page of UserOut."""
+
+    records: List[UserOut]
+
+
+def query_executor(orm_model, query: QueryBase, model):
+    """Do SQL Alchmy queries."""
+    # validate if the orm_model is known.
+    if orm_model not in BaseModelORM.__subclasses__():
+        raise ValueError(f"orm_model {orm_model} is unknown.")
+    # Run Query
+    with session() as database:
+        total_records = database.query(orm_model).count()
+        total_pages = 1 + (total_records // query.records)
+        records_database = (
+            database.query(orm_model).offset((query.page) - 1).limit(query.records).all()
         )
-    
-    @root_validator
-    def validate_skip(cls, values):
-        """Validate skip parameter."""
-        if values["skip"] < 0:
-            raise ValueError("Skip parameter must be greater than 0")
-        if values["skip"] > get_settings().api.page_size_max:
-            raise ValueError(
-                f"Skip parameter must be less than {get_settings().api.page_size_max}."
-            )
-        return values
+        # Convert to Pydantic Model
+        records: List[model] = [model.from_orm(record) for record in records_database]
+        return PageUserOut(
+            records=records,
+            query=QueryBase(page=query.page, records=query.records),
+            total_pages=total_pages,
+            total_records=total_records,
+        )
 
 
 Database = Annotated[Session, Depends(get_database_session)]
 Settings = Annotated[SettingsModel, Depends(get_settings)]
-QueryParameters = Annotated[dict, Depends(CommonQueryParameters)]
+QueryParameters = Annotated[QueryBase, Depends()]
 HashManager = Annotated[HashHandler, Depends()]
 Generator = Annotated[RandomGenerator, Depends()]
