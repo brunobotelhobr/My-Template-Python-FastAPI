@@ -4,6 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, root_validator
 
 from api.core.environment import running_environment
+from api.core.schema import Singleton
 
 
 class AuthSettings(BaseModel):
@@ -65,3 +66,7 @@ class AuthSettings(BaseModel):
         """Set orm_mode to True to allow returning ORM objects."""
 
         orm_mode = True
+
+
+class RunningAuthSettings(AuthSettings, Singleton):
+    """Opa."""

@@ -17,16 +17,61 @@ keywords = [ "python",]
 include = "api"
 from = "src"
 
-[tool.bandit]
-exclude_dirs = [ "tests",]
-skips = []
+[tool.poetry.dependencies]
+python = ">3.10,<3.12"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+toml = "^0.10.2"
+sqlalchemy = "^2.0.10"
+python-multipart = "^0.0.6"
+argon2-cffi = "^21.3.0"
 
+[tool.poetry.group.dev.dependencies]
+flake8-pyproject = "^1.2.3"
+black = "^23.3.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+pylint = "^2.17.2"
+pyflakes = "^3.0.1"
+mypy = "^1.2.0"
+autoflake = "^2.1.0"
+pytest = "^7.3.1"
+cyclonedx-bom = "^3.11.0"
+pytest-cov = "^4.0.0"
+flake8-bugbear = "^23.3.23"
+flake8-docstrings = "^1.7.0"
+flake8-tidy-imports = "^4.8.0"
+taskipy = "^1.10.4"
+httpx = "^0.24.0"
+pytest-order = "^1.1.0"
+types-toml = "^0.10.8.6"
+pylint-pydantic = "^0.1.8"
+pylint-pytest = "^1.1.2"
+#sqlalchemy-stubs = "^0.4"
+sqlalchemy = {extras = ["mypy"], version = "^2.0.12"}
+flake8-print = "^5.0.0"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "^9.1.6"
+mkdocs = "^1.4.2"
+mkdocs-material-extensions = "^1.1.1"
+pymdown-extensions = "^9.11"
+mike = "^1.1.2"
+
+[tool.poetry.group.dev.dependencies.bandit]
+version = "^1.7.5"
+extras = [ "toml",]
+
+[tool.poetry.group.docs.dependencies.mkdocstrings]
+version = "^0.21.2"
+extras = [ "python",]
+
+# Formating tools
 [tool.black]
 line_length = 90
 ignore = ""
 
-[tool.isort]
-# https://github.com/PyCQA/isort/wiki/isort-Settings
+[tool.isort]  # https://github.com/PyCQA/isort/wiki/isort-Settings
 line_length = 120
 atomic = true
 profile = "black"
@@ -38,7 +83,9 @@ known_first_party = [
 
 [tool.autoflake]
 check = true
+quiet = true
 
+# Linters
 [tool.flake8]
 max-line-length = 120
 ignore = [
@@ -55,25 +102,14 @@ ignore_missing_imports = true
 max-line-length = 120
 disable = [ 
     "E0213",  # Pydantic Validator error
+    "R0903",  # Pudantic ; R0903: Too few public methods (1/2) (too-few-public-methods)
 ]
 load-plugins = [
     "pylint_pytest",
     "pylint_pydantic",
-    "sqlalchemy.ext.mypy.plugin"
+    #"sqlalchemy.ext.mypy.plugin"
 ]
 extension-pkg-whitelist = "pydantic"
-
-[tool.poetry.dependencies]
-python = ">3.10,<3.12"
-fastapi = "^0.95.1"
-uvicorn = "^0.21.1"
-toml = "^0.10.2"
-sqlalchemy = "^2.0.10"
-python-multipart = "^0.0.6"
-jose = "^1.0.0"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-argon2-cffi = "^21.3.0"
-
 
 [tool.pylint.BASIC]
 good-names = [ ]
@@ -81,6 +117,12 @@ good-names = [ ]
 [tool.taskipy.settings]
 use_vars = true
 
+# Security tools    
+[tool.bandit]
+exclude_dirs = [ "tests",]
+skips = []
+
+# Taskipy
 [tool.taskipy.variables]
 src-dir = "src"
 name = "api"
@@ -215,41 +257,3 @@ help = "Publish documentation to the doc branch on GitHub."
 cmd = "rm poetry.lock && rm -rf database.db .mypy_cache && rm -rf .venv && rm -rf .pytest_cache && rm -rf .coverage && rm -rf dist && rm -rf site && find . -type d -name __pycache__ | xargs rm -rf > /dev/null"
 help = "Clean all generated files"
 
-[tool.poetry.group.dev.dependencies]
-flake8-pyproject = "^1.2.3"
-black = "^23.3.0"
-isort = "^5.12.0"
-flake8 = "^6.0.0"
-pylint = "^2.17.2"
-pyflakes = "^3.0.1"
-mypy = "^1.2.0"
-autoflake = "^2.1.0"
-pytest = "^7.3.1"
-cyclonedx-bom = "^3.11.0"
-pytest-cov = "^4.0.0"
-flake8-bugbear = "^23.3.23"
-flake8-docstrings = "^1.7.0"
-flake8-tidy-imports = "^4.8.0"
-taskipy = "^1.10.4"
-httpx = "^0.24.0"
-pytest-order = "^1.1.0"
-types-toml = "^0.10.8.6"
-pylint-pydantic = "^0.1.8"
-pylint-pytest = "^1.1.2"
-sqlalchemy = {extras = ["mypy"], version = "^2.0.12"}
-
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-material = "^9.1.6"
-mkdocs = "^1.4.2"
-mkdocs-material-extensions = "^1.1.1"
-pymdown-extensions = "^9.11"
-mike = "^1.1.2"
-
-[tool.poetry.group.dev.dependencies.bandit]
-version = "^1.7.5"
-extras = [ "toml",]
-
-[tool.poetry.group.docs.dependencies.mkdocstrings]
-version = "^0.21.2"
-extras = [ "python",]

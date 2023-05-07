@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 
 from api.auth.model import RevokedTokenORM
 from api.auth.schema import RevokedToken
-from api.core.database import engine, get_database_session
-from api.settings.utils import global_settings
+from api.core.database import get_database_session
+from api.core.dependencies import Settings
 from api.users.model import UserORM
 from api.users.schema import UserOut
 
@@ -27,8 +27,8 @@ class JWTFactory(BaseModel):
         try:
             data = jwt.decode(
                 token,
-                key=global_settings.auth.jwt_key,
-                algorithms=global_settings.auth.jwt_algorithm,
+                key=Settings.auth.jwt_key,
+                algorithms=Settings.auth.jwt_algorithm,
             )
         except JWTError as e:
             raise HTTPException(
@@ -40,7 +40,7 @@ class JWTFactory(BaseModel):
     def __check_revoked(self, token: str) -> bool:
         """Check if token is revoked."""
         data = self.__parce(token)
-        if global_settings.auth.jwt_revokes_store == "memory":
+        if Settings.auth.jwt_revokes_store == "memory":
             if (
                 RevokedToken(
                     token=token, expiration=datetime.utcfromtimestamp(float(data["exp"]))
@@ -51,8 +51,8 @@ class JWTFactory(BaseModel):
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Not authorized: Invalid token.",
                 )
-        if global_settings.auth.jwt_revokes_store == "database":
-            with Session(engine) as session:
+        if Settings.auth.jwt_revokes_store == "database":
+            with get_database_session() as session:
                 if (
                     session.query(RevokedTokenORM)
                     .filter(RevokedTokenORM.token == token)
@@ -62,7 +62,7 @@ class JWTFactory(BaseModel):
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Not authorized: Invalid token.",
                     )
-        if global_settings.auth.jwt_revokes_store == "cache":
+        if Settings.auth.jwt_revokes_store == "cache":
             raise NotImplementedError
         return True
 
@@ -74,10 +74,10 @@ class JWTFactory(BaseModel):
                     "sub": email,
                     "iat": datetime.utcnow(),
                     "exp": datetime.utcnow()
-                    + timedelta(minutes=global_settings.auth.jwt_expiration_initial),
+                    + timedelta(minutes=Settings.auth.jwt_expiration_initial),
                 },
-                key=global_settings.auth.jwt_key,
-                algorithm=global_settings.auth.jwt_algorithm,
+                key=Settings.auth.jwt_key,
+                algorithm=Settings.auth.jwt_algorithm,
             )
         )
 
@@ -116,14 +116,14 @@ class JWTFactory(BaseModel):
         data = self.__parce(token)
         # Add to bad tokens
         if self.__check_revoked(token):
-            if global_settings.auth.jwt_revokes_store == "memory":
+            if Settings.auth.jwt_revokes_store == "memory":
                 bad_tokens.append(
                     RevokedToken(
                         token=token, expiration=datetime.utcfromtimestamp(data["exp"])
                     )
                 )
-            if global_settings.auth.jwt_revokes_store == "database":
-                with Session(engine) as session:
+            if Settings.auth.jwt_revokes_store == "database":
+                with get_database_session() as session:
                     session.add(
                         RevokedTokenORM(
                             token=token, expiration=datetime.utcfromtimestamp(data["exp"])
@@ -131,7 +131,7 @@ class JWTFactory(BaseModel):
                     )
                     session.commit()
                     print("salvei")
-            if global_settings.auth.jwt_revokes_store == "cache":
+            if Settings.auth.jwt_revokes_store == "cache":
                 raise NotImplementedError
         return True
 
@@ -145,10 +145,10 @@ class JWTFactory(BaseModel):
         # Calculate new expiration
         old_expiration = datetime.utcfromtimestamp(float(data["exp"]))
         new_expiration = old_expiration + timedelta(
-            minutes=global_settings.auth.jwt_expiration_step
+            minutes=Settings.auth.jwt_expiration_step
         )
         max_expiration = datetime.utcnow() + timedelta(
-            minutes=global_settings.auth.jwt_expiration_max
+            minutes=Settings.auth.jwt_expiration_max
         )
         new_expiration = min(new_expiration, max_expiration)
         # Renew token
@@ -158,8 +158,8 @@ class JWTFactory(BaseModel):
                 "iat": data["iat"],
                 "exp": new_expiration.utcnow(),
             },
-            key=global_settings.auth.jwt_key,
-            algorithm=global_settings.auth.jwt_algorithm,
+            key=Settings.auth.jwt_key,
+            algorithm=Settings.auth.jwt_algorithm,
         )
 
     def __new__(cls):

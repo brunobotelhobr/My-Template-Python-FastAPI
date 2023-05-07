@@ -1,6 +1,7 @@
 """General API database utilities."""
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 from api.core.environment import database_environment, running_environment
 
@@ -25,17 +26,20 @@ def create_local_engine():
 engine = create_local_engine()
 session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
-class BaseModelORM(DeclarativeBase):
-    """BaseModelORM class for all the database models."""  # pylint: disable=too-few-public-methods
-
-    pass  # pylint: disable=unnecessary-pass
+# Create the base model
+BaseModelORM = declarative_base()
 
 
 def reset_database() -> bool:
     """Reset the database."""
     BaseModelORM.metadata.drop_all(bind=engine)
     BaseModelORM.metadata.create_all(bind=engine)
+    return True
+
+
+def shutdown_database() -> bool:
+    """Shutdown the database."""
+    engine.dispose()
     return True
 
 

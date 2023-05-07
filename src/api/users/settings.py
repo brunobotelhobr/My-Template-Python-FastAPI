@@ -1,7 +1,7 @@
-"""User settings."""
-from typing import Literal
-
+"""User Settings."""
 from pydantic import BaseModel, Field, root_validator
+
+from api.core.schema import Singleton
 
 
 class PasswordPolicy(BaseModel):
@@ -79,11 +79,23 @@ class PasswordPolicy(BaseModel):
         orm_mode = True
 
 
+class RunningPasswordPolicy(PasswordPolicy, Singleton):
+    """Singleton password policy model."""
+
+
 class UserSettings(BaseModel):
     """User configuration model."""
 
-    login_with: Literal["username", "email"] = Field(
-        title="Login with", description="Login with username or email", default="username"
+    allow_login_with_email: bool = Field(
+        title="Allow login with email",
+        description="If enabled, users can login with their email and password.",
+        default=True,
+    )
+
+    allow_login_with_username: bool = Field(
+        title="Allow login with username",
+        description="If enabled, users can login with their username and password.",
+        default=True,
     )
 
     allow_delete: bool = Field(
@@ -132,9 +144,28 @@ class UserSettings(BaseModel):
         """Validate settings user."""
         if properties["password_strikes"] < 1:
             raise ValueError("password_strikes must be greater than or equal to 1")
+        if properties["password_strikes"] > 128:
+            raise ValueError("password_strikes must be less than or equal to 128")
+        if (
+            properties["allow_login_with_email"] is False
+            and properties["allow_login_with_username"] is False
+        ):
+            raise ValueError(
+                "allow_login_with_email and allow_login_with_username can't be both False"
+            )
         return properties
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
 
         orm_mode = True
+
+
+class RunningUserSettings(UserSettings, Singleton):
+    """Singleton User configuration model."""
+
+    password_policy: RunningPasswordPolicy = Field(
+        title="Password policy",
+        description="Password policy to be applied to all users.",
+        default=RunningPasswordPolicy(),
+    )

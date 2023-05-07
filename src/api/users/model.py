@@ -1,4 +1,4 @@
-"""User database model."""
+"""User Database Models."""
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 
 from api.core.database import BaseModelORM
@@ -14,6 +14,7 @@ class UserORM(BaseModelORM):
     name = Column(String(128), index=True, nullable=True)
     username = Column(String(64), index=True, unique=True)
     email = Column(String(256), index=True, unique=True)
+    active = Column(Boolean)
     blocked = Column(Boolean)
     verified = Column(Boolean, default=False)
     password_hash = Column(String(128), nullable=True)

@@ -2,14 +2,13 @@
 from fastapi import APIRouter, FastAPI
 
 from api.about.router import router as about_router
-from api.auth.router import router as auth_router
 from api.core.constants import app_start_parameters
-from api.core.database import engine, reset_database
-from api.core.dependencies import get_settings
+from api.core.database import reset_database, shutdown_database
 from api.core.environment import database_environment, running_environment
-from api.healthcheck.router import router as healthcheck_router
-from api.myself.router import router as myself_router
-from api.settings.router import router as settings_router
+from api.core.healthcheck.router import router as healthcheck_router
+from api.core.settings.router import router as settings_router
+
+# from api.myself.router import router as myself_router
 from api.users.router import router as user_router
 
 # Create FastAPI instance
@@ -29,22 +28,17 @@ async def startup() -> None:
     if running_environment.local.is_debug:
         if reset_database() is False:
             raise ValueError("Database reset failed")
-    # initialize settings
-    get_settings()
 
 
 # On Shutdown event
 @app.on_event("shutdown")
 async def shutdown() -> None:
     """Triggered when the application is shutting down."""
-    engine.dispose()
+    shutdown_database()
 
 
 # Assigning endpoints
 app.include_router(prefix="/about", tags=["About"], router=about_router)
-app.include_router(prefix="/auth", tags=["Auth"], router=auth_router)
-app.include_router(prefix="/myself", tags=["Myself"], router=myself_router)
-
 admin = APIRouter(tags=["Admin"])
 admin.include_router(prefix="/users", router=user_router)
 admin.include_router(prefix="/settings", router=settings_router)

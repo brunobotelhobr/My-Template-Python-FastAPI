@@ -1,32 +1,68 @@
-"""User router."""
+"""User Router."""
 from fastapi import APIRouter, HTTPException, status
 
 from api.core.dependencies import (
     Database,
     Generator,
     HashManager,
-    PageUserOut,
     QueryParameters,
     Settings,
-    query_executor,
 )
+from api.core.paginator.schema import executor
 from api.users.model import UserORM
-from api.users.schema import UserBase, UserDB, UserIn, UserOut
+from api.users.schema import PageUserOut, UserBase, UserDB, UserIn, UserOut
 
 router = APIRouter()
 
 
-@router.get("/", response_model=PageUserOut, status_code=status.HTTP_200_OK)
+@router.get(
+    "/",
+    response_model=PageUserOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successful Response."},
+        500: {"description": "Internal Server Error."},
+    },
+)
 def get_users(
     query: QueryParameters,
 ):
-    """Get a list of users."""
-    return query_executor(orm_model=UserORM, query=query, model=UserDB)
+    """
+    Get all users.
+
+    This method return a list of all users, paginated according to the query parameters.
+
+    Args:
+        query (QueryParameters): Query parameters.
+
+    Returns:
+        PageUserOut: Paginated list of users.
+    """
+    return executor(orm=UserORM, query=query, schema=UserDB)  # type: ignore[arg-type]
 
 
-@router.get("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
+@router.get(
+    "/{key}",
+    response_model=UserOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successful Response."},
+        404: {"description": "Not Found: User not found."},
+        500: {"description": "Internal Server Error."},
+    },
+)
 def get_user(key: str, database: Database):
-    """Get a user."""
+    """
+    Get a user.
+
+    This method return details of a idenfied user by the user's key.
+
+    Args:
+        key (str): User's key.
+
+    Returns:
+        UserOut: User details.
+    """
     # Check if user exists.
     user_from_database = database.query(UserORM).filter(UserORM.key == key).first()
     if not user_from_database:
@@ -35,14 +71,33 @@ def get_user(key: str, database: Database):
     return user_from_database
 
 
-@router.post("/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=UserOut,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        201: {"description": "Successful Response."},
+        422: {"description": "Unprocessable Entity: Email or Username already exists."},
+        500: {"description": "Internal Server Error."},
+    },
+)
 def create_user(
     user_in: UserIn,
     database: Database,
     generator: Generator,
     hash_handler: HashManager,
 ):
-    """Create a new user."""
+    """
+    Post a user.
+
+    This method create a new user.
+
+    Args:
+        user_in (UserIn): User data.
+
+    Returns:
+        UserOut: User details.
+    """
     # Check if a user with the same email exists.
     user_in_db = database.query(UserORM).filter(UserORM.email == user_in.email).first()
     if user_in_db is not None:
@@ -70,9 +125,28 @@ def create_user(
     return new_user
 
 
-@router.patch("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/{key}",
+    response_model=UserOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successful Response."},
+        404: {"description": "Not Found: User not found."},
+        500: {"description": "Internal Server Error."},
+    },
+)
 def update_user(user_in: UserBase, key: str, database: Database):
-    """Update a user."""
+    """
+    Update a user.
+
+    This method update a user.
+
+    Args:
+        user_in (UserBase): User data.
+
+    Returns:
+        UserOut: User details.
+    """
     # Check if user exists.
     user_from_database = database.query(UserORM).filter(UserORM.key == key).first()
     if user_from_database is None:
@@ -84,9 +158,30 @@ def update_user(user_in: UserBase, key: str, database: Database):
     return user_from_database
 
 
-@router.delete("/{key}", response_model=UserOut, status_code=status.HTTP_200_OK)
+@router.delete(
+    "/{key}",
+    response_model=UserOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Successful Response."},
+        404: {"description": "Not Found: User not found."},
+        422: {"description": "Unprocessable Entity: User deletion is not allowed."},
+        500: {"description": "Internal Server Error."},
+    },
+)
 def delete_user(key: str, database: Database, settings: Settings):
-    """Delete a user."""
+    """
+    Delete a user.
+
+    This method delete a user.
+    If the user deletion is not allowed on application settings, a 422 status code is returned.
+
+    Args:
+        key (str): User's key.
+
+    Returns:
+        UserOut: User details.
+    """
     # Check if user deletion is allowed.
     if settings.users.allow_delete is False:
         raise HTTPException(

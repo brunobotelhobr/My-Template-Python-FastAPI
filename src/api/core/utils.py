@@ -1,4 +1,4 @@
-"""General API Utilities."""
+"""Core Utilities."""
 import random
 import string
 from datetime import datetime
@@ -7,11 +7,11 @@ from uuid import uuid4
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
+from api.core.schema import Singleton
 
-class RandomGenerator:
+
+class RandomGenerator(Singleton):
     """Class to generate random values."""
-
-    __instance = None
 
     def uuid(self) -> str:
         """Return au UUDI4."""
@@ -28,9 +28,7 @@ class RandomGenerator:
 
     def name(self, words: int = 3, first_caps: bool = True) -> str:
         """
-        Summary.
-
-            Return a random name.
+        Return a random name.
 
         Args:
             words (int, optional): Number of words. Defaults to 3.
@@ -38,7 +36,6 @@ class RandomGenerator:
 
         Returns:
             str: Name.
-
         """
         name = ""
         for _ in range(words):
@@ -49,13 +46,16 @@ class RandomGenerator:
             name += " "
         return name[:-1]
 
-    def password(
-        self, size: int = 12, numbers: int = 1, special: int = 1, uper: int = 1, lower=1
+    def password(  # pylint: disable=too-many-arguments
+        self,
+        size: int = 12,
+        numbers: int = 1,
+        special: int = 1,
+        uper: int = 1,
+        lower=1,
     ) -> str:
         """
-        Summary.
-
-            Return a random password.
+        Return a random password.
 
         Args:
             size (int, optional): Size of password. Defaults to 12.
@@ -66,7 +66,6 @@ class RandomGenerator:
 
         Returns:
             str: Password.
-
         """
         # check if the sum of the numbers, special, uper and lower is less than the size of the password
         if (numbers + special + uper + lower) > size:
@@ -80,65 +79,57 @@ class RandomGenerator:
             )
 
         char_set = ""
-        p = ""
+        generated_password = ""
 
         if numbers > 0:
             # add numbers to char_set and password
             char_set += string.digits
-            p += random.choice(string.digits) * numbers
+            generated_password += random.choice(string.digits) * numbers
 
         if special > 0:
             # add special chars to char_set and password
             char_set += string.punctuation
-            p += random.choice(string.punctuation) * special
+            generated_password += random.choice(string.punctuation) * special
 
         if uper > 0:
             # add upercase chars to char_set and password
             char_set += string.ascii_uppercase
-            p += random.choice(string.ascii_uppercase) * uper
+            generated_password += random.choice(string.ascii_uppercase) * uper
 
         if lower > 0:
             # add lowercase chars to char_set and password
             char_set += string.ascii_lowercase
-            p += random.choice(string.ascii_lowercase) * lower
+            generated_password += random.choice(string.ascii_lowercase) * lower
 
         # add the remaining chars to password
-        p += "".join(random.sample(char_set, size - len(p)))
+        generated_password += "".join(
+            random.sample(char_set, size - len(generated_password))
+        )
 
-        return p
+        return generated_password
 
     def now(self) -> datetime:
-        """Return a datetime object."""
+        """Return a datetime object with the current date and time."""
         return datetime.now()
 
-    def __new__(cls):
-        """Create a singleton."""
-        if RandomGenerator.__instance is None:
-            RandomGenerator.__instance = object.__new__(cls)
-        return RandomGenerator.__instance
 
-
-class HashHandler:
+class HashHandler(Singleton):
     """Class to handle passords hashs."""
-
-    __instance = None
 
     def generate_hash(self, password: str) -> str:
         """Return a hashed password."""
-        return str(PasswordHasher().hash(password))
+        return str(PasswordHasher().hash(password))  # pylint: disable=redefined-builtin
+        # PyLint W0622: Redefining built-in 'hash' (redefined-builtin)
 
-    def verify_hash(self, password: str, hash: str) -> bool:
+    def verify_hash(
+        self, password: str, hash: str
+    ) -> bool:  # pylint: disable=redefined-builtin
+        # PyLint W0622: Redefining built-in 'hash' (redefined-builtin)
         """Verify if the hash is valid."""
         try:
             return PasswordHasher().verify(hash=hash, password=password)
         except VerifyMismatchError:
             return False
-
-    def __new__(cls):
-        """Create a singleton."""
-        if HashHandler.__instance is None:
-            HashHandler.__instance = object.__new__(cls)
-        return HashHandler.__instance
 
 
 generator = RandomGenerator()

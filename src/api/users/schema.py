@@ -1,10 +1,12 @@
-"""User schema."""
+"""User Schema."""
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, EmailStr, Field, validator
 
+from api.core.paginator.schema import PageBase
+from api.core.settings.schema import RunningSettings
 from api.core.utils import generator
-from api.settings.utils import global_settings
 
 
 class Password(BaseModel):
@@ -19,13 +21,13 @@ class Password(BaseModel):
     @validator("password")
     def passwords_match(cls, v):
         """Validate password policy."""
-        if global_settings.users.password_policy.active:
-            min_length = global_settings.users.password_policy.min_length
-            max_length = global_settings.users.password_policy.max_length
-            min_upper = global_settings.users.password_policy.min_upper
-            min_lower = global_settings.users.password_policy.min_lower
-            min_digits = global_settings.users.password_policy.min_digits
-            min_special = global_settings.users.password_policy.min_special
+        if RunningSettings().users.password_policy.active:
+            min_length = RunningSettings().users.password_policy.min_length
+            max_length = RunningSettings().users.password_policy.max_length
+            min_upper = RunningSettings().users.password_policy.min_upper
+            min_lower = RunningSettings().users.password_policy.min_lower
+            min_digits = RunningSettings().users.password_policy.min_digits
+            min_special = RunningSettings().users.password_policy.min_special
 
             if len(v) < min_length:
                 raise ValueError(f"Password must have at least {min_length} characters")
@@ -88,26 +90,26 @@ class UserBase(BaseModel):
     )
 
     @validator("name")
-    def name_must_contain_space(cls, v):
+    def name_must_contain_space(cls, value):
         """Validate property."""
-        if " " not in v:
+        if " " not in value:
             raise ValueError("must contain a space")
-        if len(v) < 5:
+        if len(value) < 5:
             raise ValueError("length must be greater than 5")
-        if len(v) > 128:
+        if len(value) > 128:
             raise ValueError("length must be less than 128")
-        return v.title()
+        return value.title()
 
     @validator("username")
-    def username_must_contain_space(cls, v):
+    def username_must_contain_space(cls, value):
         """Validate property."""
-        if " " in v:
+        if " " in value:
             raise ValueError("must not contain a space")
-        if len(v) < 5:
+        if len(value) < 5:
             raise ValueError("length must be greater than 5")
-        if len(v) > 64:
+        if len(value) > 64:
             raise ValueError("length must be less than 64")
-        return v.lower()
+        return value.lower()
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
@@ -163,13 +165,13 @@ class UserDB(UserBase):
         description="User key, it is a unique identifier.",
     )
     blocked: bool = Field(
-        default=global_settings.users.default_blocked,
+        default=RunningSettings().users.default_blocked,
         example=False,
         title="Blocked",
         description="User blocked status.",
     )
     verified: bool = Field(
-        default=global_settings.users.default_verified,
+        default=RunningSettings().users.default_verified,
         example=False,
         title="Verified",
         description="User verified status.",
@@ -195,3 +197,9 @@ class UserDB(UserBase):
         """Set orm_mode to True to allow returning ORM objects."""
 
         orm_mode = True
+
+
+class PageUserOut(PageBase):
+    """Page of UserOut."""
+
+    records: List[UserOut]  # type: ignore
