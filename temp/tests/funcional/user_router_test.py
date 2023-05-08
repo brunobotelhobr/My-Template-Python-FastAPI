@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from api.core.utils import generator
 from api.main import app
 from api.settings.router import settings
-from api.users.schema import UserIn, UserOut
+from api.users.model import UserIn, UserOut
 
 client = TestClient(app)
 

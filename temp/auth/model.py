@@ -1,14 +1,11 @@
-"""Userauth model."""
-from sqlalchemy import Column, DateTime, String
+"""Auth Model."""
+# from datetime import datetime
 
-from api.core.database import BaseModelORM
+# from pydantic import BaseModel, EmailStr, Field
 
 
-class RevokedTokenORM(BaseModelORM):
-    """JWT Token Revoked Model."""
+# class AuthRequest(BaseModel):
+#     """Auth Request Model."""
 
-    __tablename__ = "revokedtokens"
-    __table_args__ = {"extend_existing": True}
-
-    token = Column(String(60), index=True, primary_key=True)
-    expiration = Column(DateTime(timezone=True))
+#     username: EmailStr = Field(alias="email", example="john.doe@email.com")
+#     password: str = Field(alias="password", example="P@ssw0rd")

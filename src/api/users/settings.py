@@ -1,11 +1,11 @@
 """User Settings."""
 from pydantic import BaseModel, Field, root_validator
 
-from api.core.schema import Singleton
+from api.core.model import Singleton
 
 
 class PasswordPolicy(BaseModel):
-    """Password policy model."""
+    """Password Policy."""
 
     active: bool = Field(
         title="Activate password policy",
@@ -80,11 +80,11 @@ class PasswordPolicy(BaseModel):
 
 
 class RunningPasswordPolicy(PasswordPolicy, Singleton):
-    """Singleton password policy model."""
+    """Running Password Policy."""
 
 
 class UserSettings(BaseModel):
-    """User configuration model."""
+    """User Configuration."""
 
     allow_login_with_email: bool = Field(
         title="Allow login with email",
@@ -162,7 +162,7 @@ class UserSettings(BaseModel):
 
 
 class RunningUserSettings(UserSettings, Singleton):
-    """Singleton User configuration model."""
+    """Running User Configuration model."""
 
     password_policy: RunningPasswordPolicy = Field(
         title="Password policy",

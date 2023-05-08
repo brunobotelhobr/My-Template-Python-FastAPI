@@ -5,8 +5,8 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from api.core.database import get_database_session
-from api.core.paginator.schema import QueryBase
-from api.core.settings.schema import RunningSettings
+from api.core.paginator.model import QueryBase
+from api.core.settings.model import RunningSettings
 from api.core.settings.utils import get_running_settings
 from api.core.utils import HashHandler, RandomGenerator, get_generator, get_hash_handler
 

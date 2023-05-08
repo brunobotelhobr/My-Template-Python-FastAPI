@@ -1,19 +1,19 @@
 """Authentication Router."""
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestFormStrict
-from sqlalchemy.orm import Session
+# from fastapi import APIRouter, Depends, HTTPException, Request, status
+# from fastapi.responses import JSONResponse
+# from fastapi.security import OAuth2PasswordRequestFormStrict
+# from sqlalchemy.orm import Session
 
-from api.auth.schema import AuthRequest, Token
-from api.auth.utils import authenticate, jwt_factory  # type: ignore
-from api.core.database import get_database_session
-from api.core.dependencies import Database
-from api.core.schema import SimpleMessage
-from api.core.utils import hash_handler
-from api.users.model import UserORM
-from api.users.schema import UserDB, UserOut
+# from api.auth.model import AuthRequest, Token
+# from api.auth.utils import authenticate, jwt_factory  # type: ignore
+# from api.core.database import get_database_session
+# from api.core.dependencies import Database
+# from api.core.schema import SimpleMessage
+# from api.core.utils import hash_handler
+# from api.users.model import UserORM
+# from api.users.schema import UserDB, UserOut
 
-router = APIRouter()
+# router = APIRouter()
 
 
 # @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)

@@ -1,7 +1,7 @@
 """Settings router."""
 from fastapi import APIRouter, HTTPException, status
 
-from api.core.settings.schema import RunningSettings
+from api.core.settings.model import RunningSettings
 
 router = APIRouter()
 

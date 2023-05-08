@@ -3,7 +3,7 @@ from typing import Any
 
 import toml
 
-from api.core.environment import environment
+from api.core.utils import environment
 
 # General Constants
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]

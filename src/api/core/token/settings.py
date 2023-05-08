@@ -3,16 +3,12 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, root_validator
 
-from api.core.environment import running_environment
-from api.core.schema import Singleton
+from api.core.model import Singleton
 
 
-class AuthSettings(BaseModel):
-    """Settings model."""
+class JWTSettings(BaseModel):
+    """JWT Settings."""
 
-    jwt_key: str = Field(
-        title="JWT key", description="JWT key", default=running_environment.jwt_key
-    )
     jwt_algorithm: str = Field(
         title="JWT algorithm", description="JWT algorithm", default="HS256"
     )
@@ -41,26 +37,26 @@ class AuthSettings(BaseModel):
     )
 
     @root_validator
-    def jwt_expiration_validator(cls, v):  # pylint: disable=E0213
+    def jwt_expiration_validator(cls, values):  # pylint: disable=E0213
         """Validate JWT expiration."""
-        if v["jwt_expiration_initial"] < 1:
+        if values["jwt_expiration_initial"] < 1:
             raise ValueError("JWT expiration initial must be greater than 0.")
-        if v["jwt_expiration_step"] < 0:
+        if values["jwt_expiration_step"] < 0:
             raise ValueError("JWT expiration step must be greater than or equal to 0.")
-        if v["jwt_expiration_max"] < 1:
+        if values["jwt_expiration_max"] < 1:
             raise ValueError("JWT expiration max must be greater than 0.")
-        if v["jwt_expiration_initial"] > v["jwt_expiration_max"]:
+        if values["jwt_expiration_initial"] > values["jwt_expiration_max"]:
             raise ValueError(
                 "JWT expiration initial must be less than JWT expiration max."
             )
         if (
-            v["jwt_expiration_step"] + v["jwt_expiration_initial"]
-            > v["jwt_expiration_max"]
+            values["jwt_expiration_step"] + values["jwt_expiration_initial"]
+            > values["jwt_expiration_max"]
         ):
             raise ValueError(
                 "JWT expiration step plus JWT expiration initial must be less than JWT expiration max."
             )
-        return v
+        return values
 
     class Config:  # pylint: disable=too-few-public-methods
         """Set orm_mode to True to allow returning ORM objects."""
@@ -68,5 +64,5 @@ class AuthSettings(BaseModel):
         orm_mode = True
 
 
-class RunningAuthSettings(AuthSettings, Singleton):
-    """Opa."""
+class RunningJWTSettings(JWTSettings, Singleton):
+    """Running JWT Settings."""

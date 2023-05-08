@@ -8,9 +8,9 @@ from api.core.dependencies import (
     QueryParameters,
     Settings,
 )
-from api.core.paginator.schema import executor
-from api.users.model import UserORM
-from api.users.schema import PageUserOut, UserBase, UserDB, UserIn, UserOut
+from api.core.paginator.utils import executor
+from api.users.model import PageUserOut, UserBase, UserDB, UserIn, UserOut
+from api.users.orm import UserORM
 
 router = APIRouter()
 

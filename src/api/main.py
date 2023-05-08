@@ -6,9 +6,9 @@ from api.core.constants import app_start_parameters
 from api.core.database import reset as reset_database
 from api.core.database import shutdown as shutdown_database
 from api.core.database import test as test_database
-from api.core.environment import environment
 from api.core.healthcheck.router import router as healthcheck_router
 from api.core.settings.router import router as settings_router
+from api.core.utils import environment
 from api.users.router import router as user_router
 
 # Create FastAPI instance

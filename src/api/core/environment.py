@@ -1,10 +1,10 @@
 """Core Environment."""
 from enum import Enum
+from uuid import uuid4
 
 from pydantic import BaseSettings, Field
 
-from api.core.schema import Singleton
-from api.core.utils import generator
+from api.core.model import Singleton
 
 
 class Behavior(str, Enum):
@@ -75,7 +75,7 @@ class RunnigeEnviroment(BaseSettings, Singleton):
         description="The behavior of the API, it can be: LOCAL, STAGING, TESTING or PRODUCTION.",
     )
     jwt_key: str = Field(
-        default=generator.uuid(),
+        default=str(uuid4()),
         env="API_JWT_KEY",
         title="JWT key",
         description="The key used to encrypt the JWT, if not provided, a random key will be generated.",
@@ -96,7 +96,3 @@ class Environment(DatabaseEnvironment, RunnigeEnviroment, Singleton):
 
         env_prefix = "API_"
         case_sensitive = False
-
-
-# Environment settings
-environment = Environment()
