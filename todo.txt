@@ -47,3 +47,5 @@ ordenaçao de query?
 login with user or email?
 
 initialize settings
+
+block, validate, active user?

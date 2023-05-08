@@ -2,6 +2,10 @@
 from api.core.environment import Environment
 from api.core.model import HashHandler, RandomGenerator
 
+generator = RandomGenerator()
+hash_handler = HashHandler()
+environment = Environment()
+
 
 def get_generator() -> RandomGenerator:
     """Return a RandomGenerator instance."""
@@ -16,8 +20,3 @@ def get_hash_handler() -> HashHandler:
 def get_environment() -> Environment:
     """Return a Environment instance."""
     return Environment()
-
-
-generator = RandomGenerator()
-hash_handler = HashHandler()
-environment = Environment()

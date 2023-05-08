@@ -4,9 +4,9 @@ import json
 from pydantic import BaseModel, Field
 
 from api.core.database import session
+from api.core.jwt.settings import JWTSettings, RunningJWTSettings
 from api.core.model import Singleton
 from api.core.settings.orm import SettingsORM
-from api.core.token.settings import JWTSettings, RunningJWTSettings
 from api.core.utils import environment
 from api.users.settings import RunningUserSettings, UserSettings
 

@@ -6,9 +6,9 @@ from jose import JWTError, jwt
 from pydantic import BaseModel
 
 from api.core.database import session
+from api.core.jwt.orm import RevokedTokenORM
 from api.core.model import Singleton
 from api.core.settings.utils import running_settings
-from api.core.token.orm import RevokedTokenORM
 from api.core.utils import environment
 
 # To fix!
