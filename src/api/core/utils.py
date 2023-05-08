@@ -24,7 +24,7 @@ class RandomGenerator(Singleton):
     def email(self) -> str:
         """Return a random email."""
         chars = string.ascii_letters + string.digits
-        return "".join(random.choices(chars, k=8)) + "@example.com"
+        return str("".join(random.choices(chars, k=8)) + "@example.com")
 
     def name(self, words: int = 3, first_caps: bool = True) -> str:
         """
@@ -44,7 +44,7 @@ class RandomGenerator(Singleton):
             for _ in range(random.randint(3, 8)):
                 name += random.choice(string.ascii_lowercase)
             name += " "
-        return name[:-1]
+        return str(name[:-1])
 
     def password(  # pylint: disable=too-many-arguments
         self,
@@ -106,7 +106,7 @@ class RandomGenerator(Singleton):
             random.sample(char_set, size - len(generated_password))
         )
 
-        return generated_password
+        return str(generated_password)
 
     def now(self) -> datetime:
         """Return a datetime object with the current date and time."""
@@ -122,14 +122,24 @@ class HashHandler(Singleton):
         # PyLint W0622: Redefining built-in 'hash' (redefined-builtin)
 
     def verify_hash(
-        self, password: str, hash: str
-    ) -> bool:  # pylint: disable=redefined-builtin
+        self, password: str, hash: str  # pylint: disable=redefined-builtin
+    ) -> bool:
         # PyLint W0622: Redefining built-in 'hash' (redefined-builtin)
         """Verify if the hash is valid."""
         try:
             return PasswordHasher().verify(hash=hash, password=password)
         except VerifyMismatchError:
             return False
+
+
+def get_generator() -> RandomGenerator:
+    """Return a RandomGenerator instance."""
+    return RandomGenerator()
+
+
+def get_hash_handler() -> HashHandler:
+    """Return a HashHandler instance."""
+    return HashHandler()
 
 
 generator = RandomGenerator()

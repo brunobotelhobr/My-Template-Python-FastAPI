@@ -39,6 +39,7 @@ def get_users(
         PageUserOut: Paginated list of users.
     """
     return executor(orm=UserORM, query=query, schema=UserDB)  # type: ignore[arg-type]
+    # MyPy is not recognizing herance from PageBase
 
 
 @router.get(
@@ -82,10 +83,7 @@ def get_user(key: str, database: Database):
     },
 )
 def create_user(
-    user_in: UserIn,
-    database: Database,
-    generator: Generator,
-    hash_handler: HashManager,
+    user_in: UserIn, database: Database, generator: Generator, hash_handler: HashManager
 ):
     """
     Post a user.

@@ -1,13 +1,13 @@
 """Core Environment."""
 from enum import Enum
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, Field
 
-from api.core.utils import generator
 from api.core.schema import Singleton
+from api.core.utils import generator
 
 
-class EnvironmentBehavior(str, Enum):
+class Behavior(str, Enum):
     """Supported environments and their properties."""
 
     LOCAL = "LOCAL"
@@ -34,8 +34,29 @@ class EnvironmentBehavior(str, Enum):
 class DatabaseEnvironment(BaseSettings, Singleton):
     """Class to store the configuration of the database, it loads the environment variables with a prefix."""
 
-    database_connection_url: str = "sqlite:///database.db"
-    aut_create_models: bool = True
+    database_lazzy_loader: bool = Field(
+        default=True,
+        env="API_DB_LAZZY_LOADER",
+        title="Database lazzy loader",
+        description=(
+            "If True, the database will use the lazzy loader, "
+            + "building tables and then, initializing the settings,"
+            + "set this to false if you are using alembic, "
+            + "don't enable it in production."
+        ),
+    )
+    database_connection_url: str = Field(
+        default="sqlite:///database.db",
+        env="API_DB_CONNECTION_URL",
+        title="Database connection url",
+        description="The connection url of the database.",
+    )
+    aut_create_models: bool = Field(
+        default=True,
+        env="API_DB_AUT_CREATE_MODELS",
+        title="Aut create models",
+        description="If True, the models will be created automatically.",
+    )
 
     class Config:
         """Load environment variables with a prefix and make them case sensitive."""
@@ -47,8 +68,18 @@ class DatabaseEnvironment(BaseSettings, Singleton):
 class RunnigeEnviroment(BaseSettings, Singleton):
     """Class to store the enviroment of the API."""
 
-    local: EnvironmentBehavior = EnvironmentBehavior.LOCAL
-    jwt_key: str = generator.uuid()
+    behavior: Behavior = Field(
+        default=Behavior.LOCAL,
+        env="API_BEHAVIOR",
+        title="API behavior",
+        description="The behavior of the API, it can be: LOCAL, STAGING, TESTING or PRODUCTION.",
+    )
+    jwt_key: str = Field(
+        default=generator.uuid(),
+        env="API_JWT_KEY",
+        title="JWT key",
+        description="The key used to encrypt the JWT, if not provided, a random key will be generated.",
+    )
 
     class Config:
         """Load environment variables with a prefix and make them case sensitive."""
@@ -57,5 +88,15 @@ class RunnigeEnviroment(BaseSettings, Singleton):
         case_sensitive = False
 
 
-running_environment = RunnigeEnviroment()
-database_environment = DatabaseEnvironment()
+class Environment(DatabaseEnvironment, RunnigeEnviroment, Singleton):
+    """Class to store the configuration of the API."""
+
+    class Config:
+        """Load environment variables with a prefix and make them case sensitive."""
+
+        env_prefix = "API_"
+        case_sensitive = False
+
+
+# Environment settings
+environment = Environment()

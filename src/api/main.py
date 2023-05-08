@@ -3,12 +3,12 @@ from fastapi import APIRouter, FastAPI
 
 from api.about.router import router as about_router
 from api.core.constants import app_start_parameters
-from api.core.database import reset_database, shutdown_database
-from api.core.environment import database_environment, running_environment
+from api.core.database import reset as reset_database
+from api.core.database import shutdown as shutdown_database
+from api.core.database import test as test_database
+from api.core.environment import environment
 from api.core.healthcheck.router import router as healthcheck_router
 from api.core.settings.router import router as settings_router
-
-# from api.myself.router import router as myself_router
 from api.users.router import router as user_router
 
 # Create FastAPI instance
@@ -20,14 +20,17 @@ app = FastAPI(**app_start_parameters)
 async def startup() -> None:
     """Triggered when the application is starting up."""
     # Check if the environment is initialized
-    if running_environment is None:
-        raise ValueError("EnvironmentBehavior not initialized")
-    if database_environment is None:
-        raise ValueError("Database settings not initialized")
-    # Initialize database, if debug mode is enabled
-    if running_environment.local.is_debug:
-        if reset_database() is False:
-            raise ValueError("Database reset failed")
+    if environment is None:
+        raise ValueError("Environment not initialized")
+    # Initialize the database, if debug
+    if environment.behavior.is_debug:
+        # Reset the database
+        reset_database()
+    # Test the database connection, raise error if not possible.
+    if not test_database():
+        raise ValueError("Database connection failed")
+    # FInish Lazzy Loader
+    environment.database_lazzy_loader = False
 
 
 # On Shutdown event

@@ -4,6 +4,7 @@ import json
 from pydantic import BaseModel, Field
 
 from api.core.database import session
+from api.core.environment import environment
 from api.core.schema import Singleton
 from api.core.settings.model import SettingsORM
 from api.users.settings import RunningUserSettings, UserSettings
@@ -78,6 +79,8 @@ class RunningSettings(Settings, Singleton):
     def load(self) -> bool:
         """Load the configuration from the database."""
         with session() as database_session:
+            if environment.database_lazzy_loader:
+                return True
             settings_from_database = (
                 database_session.query(SettingsORM)
                 .filter(SettingsORM.name == "global")
@@ -93,7 +96,7 @@ class RunningSettings(Settings, Singleton):
                         setattr(self, key, orm_model(**value))
                     else:
                         setattr(self, key, value)
-        return True
+            return True
 
     def reset(self) -> bool:
         """Reset the configuration from the database."""

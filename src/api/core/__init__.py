@@ -1,1 +1,1 @@
-"""Code Module."""
+"""Settings Module."""

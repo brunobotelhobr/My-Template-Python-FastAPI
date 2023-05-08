@@ -19,7 +19,7 @@ class Password(BaseModel):
     )
 
     @validator("password")
-    def passwords_match(cls, v):
+    def passwords_match(cls, value):
         """Validate password policy."""
         if RunningSettings().users.password_policy.active:
             min_length = RunningSettings().users.password_policy.min_length
@@ -29,34 +29,34 @@ class Password(BaseModel):
             min_digits = RunningSettings().users.password_policy.min_digits
             min_special = RunningSettings().users.password_policy.min_special
 
-            if len(v) < min_length:
+            if len(value) < min_length:
                 raise ValueError(f"Password must have at least {min_length} characters")
 
-            if len(v) > max_length:
+            if len(value) > max_length:
                 raise ValueError(f"Password must have at most {max_length} characters")
 
             if min_upper > 0:
-                if sum(1 for i in v if i.isupper()) < min_upper:
+                if sum(1 for caracter in value if caracter.isupper()) < min_upper:
                     raise ValueError(
                         f"Password must have at least {min_upper} uppercase letters"
                     )
 
             if min_lower > 0:
-                if sum(1 for i in v if i.islower()) < min_lower:
+                if sum(1 for caracter in value if caracter.islower()) < min_lower:
                     raise ValueError(
                         f"Password must have at least {min_lower} lowercase letters"
                     )
 
             if min_digits > 0:
-                if sum(1 for i in v if i.isdigit()) < min_digits:
+                if sum(1 for caracter in value if caracter.isdigit()) < min_digits:
                     raise ValueError(f"Password must have at least {min_digits} digits")
 
             if min_special > 0:
-                if sum(1 for i in v if not i.isalnum()) < min_special:
+                if sum(1 for caracter in value if not caracter.isalnum()) < min_special:
                     raise ValueError(
                         f"Password must have at least {min_special} special characters"
                     )
-        return v
+        return value
 
     class Config:
         """Set orm_mode to True to allow returning ORM objects."""
@@ -203,3 +203,4 @@ class PageUserOut(PageBase):
     """Page of UserOut."""
 
     records: List[UserOut]  # type: ignore
+    # MyPy does not support recursive types yet

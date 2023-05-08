@@ -1,9 +1,9 @@
-"""General API Constants."""
+"""Core Constants."""
 from typing import Any
 
 import toml
 
-from api.core.environment import running_environment
+from api.core.environment import environment
 
 # General Constants
 app_name = toml.load("pyproject.toml")["tool"]["poetry"]["name"]
@@ -16,7 +16,7 @@ app_start_parameters: dict[str, Any] = {
     "title": app_name,
     "version": app_version,
     "description": "API for the " + app_name + " application.",
-    "debug": running_environment.local.is_debug,
+    "debug": environment.behavior.is_debug,
     "license_info": {
         "name": "MIT",
         "database_connection_url": "https://opensource.org/licenses/MIT",
@@ -28,7 +28,7 @@ app_start_parameters: dict[str, Any] = {
     },
 }
 
-if running_environment.local.is_debug is True:
+if environment.behavior.is_debug is True:
     app_start_parameters["redoc_url"] = "/redoc"
     app_start_parameters["openapi_url"] = "/openapi.json"
     app_start_parameters["docs_url"] = "/"
