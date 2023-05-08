@@ -49,3 +49,4 @@ login with user or email?
 initialize settings
 
 block, validate, active user?
+user and email awnays in lowercases

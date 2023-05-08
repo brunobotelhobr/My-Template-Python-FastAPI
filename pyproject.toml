@@ -91,6 +91,7 @@ quiet = true
 max-line-length = 120
 ignore = [
     "W503", # Update PEP8, now binary operators should come first.
+    "B008", # Do not perform function calls in argument defaults. COnflict with Dependencis from FastAPI.
     ]
 per-file-ignores = []
 count = true

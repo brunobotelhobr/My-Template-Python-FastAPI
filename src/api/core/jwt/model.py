@@ -1,9 +1,10 @@
 """JWT Schema."""
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException, status
+from fastapi import Form, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from api.core.database import session
 from api.core.jwt.orm import RevokedTokenORM
@@ -81,9 +82,9 @@ class JWTFactory(BaseModel, Singleton):
             raise NotImplementedError
         return True
 
-    def create(self, email: str) -> str:
+    def create(self, email: str) -> Token:
         """Generate JWT."""
-        return str(
+        token = str(
             jwt.encode(
                 {
                     "sub": email,
@@ -95,8 +96,9 @@ class JWTFactory(BaseModel, Singleton):
                 algorithm=running_settings.jwt.jwt_algorithm,
             )
         )
+        return Token(access_token=token, token_type="bearer")
 
-    def verify(self, token: str):
+    def verify(self, token: str) -> str:
         """Verify JWT."""
         # Is it a Valit Token?
         data = self.__parce(token)
@@ -120,7 +122,7 @@ class JWTFactory(BaseModel, Singleton):
             )
         # Is ir revoked?
         self.__check_revoked(token)
-        return data["sub"]
+        return str(data["sub"])
 
     def revoke(self, token: str) -> bool:
         """Revoke JWT."""
@@ -182,3 +184,26 @@ class JWTFactory(BaseModel, Singleton):
             key=environment.jwt_key,
             algorithm=running_settings.jwt.jwt_algorithm,
         )
+
+
+class AuthRequest(BaseModel):
+    """Auth Request Model."""
+
+    username: str = Field(
+        title="Username or Email",
+        description="Username or Email, depending on the configuration.",
+        example="john.doe@email.com",
+    )
+    password: str = Field(title="Password", description="Password.", example="P@ssw0rd")
+
+
+class AuthForm(OAuth2PasswordRequestForm):
+    """Auth Form Model."""
+
+    grant_type: str = Form(default="password", regex="password")
+    username: str = Form(
+        title="Username or Email",
+        description="Username or Email, depending on the configuration.",
+        example="john.doe@example.com",
+    )
+    password: str = Form(title="Password", description="Password.", example="P@ssw0rd")

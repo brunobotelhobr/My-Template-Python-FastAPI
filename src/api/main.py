@@ -2,6 +2,7 @@
 from fastapi import APIRouter, FastAPI
 
 from api.about.router import router as about_router
+from api.auth.router import router as auth_router
 from api.core.constants import app_start_parameters
 from api.core.database import reset as reset_database
 from api.core.database import shutdown as shutdown_database
@@ -42,6 +43,7 @@ async def shutdown() -> None:
 
 # Assigning endpoints
 app.include_router(prefix="/about", tags=["About"], router=about_router)
+app.include_router(prefix="/auth", tags=["Auth"], router=auth_router)
 admin = APIRouter(tags=["Admin"])
 admin.include_router(prefix="/users", router=user_router)
 admin.include_router(prefix="/settings", router=settings_router)
