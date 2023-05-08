@@ -1,1 +1,1 @@
-"""Paginator mOdelue."""
+"""Paginator Module."""
