@@ -48,9 +48,9 @@ pytest-order = "^1.1.0"
 types-toml = "^0.10.8.6"
 pylint-pydantic = "^0.1.8"
 pylint-pytest = "^1.1.2"
-#sqlalchemy-stubs = "^0.4"
 sqlalchemy = {extras = ["mypy"], version = "^2.0.12"}
 flake8-print = "^5.0.0"
+ipdb = "^0.13.13"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.1.6"
@@ -146,6 +146,10 @@ recursive = true
 [tool.taskipy.tasks.run]
 cmd = "uvicorn {name}.main:app --reload"
 help = "Run application"
+
+[tool.taskipy.tasks.run-debug]
+cmd = "python scripts/debugger-local.py"
+help = "Run application with ipdb debugger"
 
 [tool.taskipy.tasks.pre-commit]
 cmd = "task format && task lint && task test"

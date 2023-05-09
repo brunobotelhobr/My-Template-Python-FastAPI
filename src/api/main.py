@@ -50,3 +50,9 @@ admin.include_router(prefix="/settings", router=settings_router)
 
 app.include_router(prefix="/admin", router=admin)
 app.include_router(prefix="/healthcheck", tags=["Healthcheck"], router=healthcheck_router)
+
+# Run the application if the file is executed directly
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)
