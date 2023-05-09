@@ -2,6 +2,7 @@
 from fastapi import APIRouter, status
 
 from api.core.constants import app_version
+from api.core.dependencies import Authenticate
 
 router = APIRouter()
 
@@ -14,11 +15,10 @@ router = APIRouter()
         500: {"description": "Internal Server Error."},
     },
 )
-def version() -> dict[str, str]:
+def version(who: Authenticate) -> dict[str, str]:
     """
-    Get the Version of the Application.
+    Get Version.
 
-    Returns:
-        dict[str, str]: Version of the Application.
+    Get the Version of the Application.
     """
     return {"version": app_version}

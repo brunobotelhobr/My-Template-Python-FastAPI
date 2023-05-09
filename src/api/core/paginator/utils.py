@@ -30,9 +30,7 @@ def executor(orm, schema: BaseModel, query: QueryBase) -> PageBase:
     with session() as database_session:
         total_records = database_session.query(orm).count()
         total_pages = ceil(total_records / query.records)
-        records_database = (
-            database_session.query(orm).offset(query.page - 1).limit(query.records).all()
-        )
+        records_database = database_session.query(orm).offset(query.page - 1).limit(query.records).all()
         # Convert to Pydantic Model
         records: List[BaseModel] = []
         for record in records_database:

@@ -30,7 +30,7 @@ async def startup() -> None:
     # Test the database connection, raise error if not possible.
     if not test_database():
         raise ValueError("Database connection failed")
-    # FInish Lazzy Loader
+    # Finish Lazzy Loader
     environment.database_lazzy_loader = False
 
 

@@ -50,3 +50,6 @@ initialize settings
 
 block, validate, active user?
 user and email awnays in lowercases
+
+[00:37, 08/05/2023] Bruno Botelho: Puthon -i App.py (interativo)
+[00:37, 08/05/2023] Bruno Botelho: Devugger va code

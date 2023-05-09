@@ -1,24 +1,34 @@
 """Auth Router."""
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.core.jwt.model import AuthForm, AuthRequest, Token
-from api.core.jwt.utils import authenticate
+from api.core.jwt.utils import authenticate, barear, renew, revoke
+from api.core.model import SimpleMessage
 
 router = APIRouter()
 
 
-@router.post("/login-form", status_code=status.HTTP_200_OK, response_model=Token)
+@router.post(
+    "/login-form",
+    status_code=status.HTTP_200_OK,
+    response_model=Token,
+    responses={
+        200: {"description": "Successful Response."},
+        400: {"description": "Bad Request: Invalid credentials."},
+        403: {"description": "Forbidden: Wrong credetials or user is not active, not verified or is blocked."},
+        500: {"description": "Internal Server Error."},
+    },
+)
 def post_login_form(form: AuthForm = Depends()) -> Token:
     """
-    Post Login.
+    Post Login Form.
 
-    Will return a JWT token if the user credentials are valid.
-
-    Args:
-        form (AuthForm): Form with username and password.
-
-    Returns:
-        Token: JWT token.
+    Will return a JWT token if the user credentials are valid and the user is:
+    - Verified
+    - Active
+    - Not Blocked
     """
     # Validate Received Data
     try:
@@ -31,44 +41,46 @@ def post_login_form(form: AuthForm = Depends()) -> Token:
     return authenticate(credentials=credentials)
 
 
-# @router.get("/renew", status_code=status.HTTP_200_OK, response_model=Token)
-# def renew(req: Request, who: UserOut = Depends(authenticate)):
-#     """Renew JWT."""
-#     # check if me is valid
-#     if who is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Not authorized: Invalid credentials.",
-#         )
-#     jwt_factory.revoke(req.headers["authorization"])
-#     token = jwt_factory.renew(req.headers["authorization"])
-#     if token is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Not authorized: Invalid credentials.",
-#         )
-#     return {"token_type": "bearer", "access_token": token}
+@router.post(
+    "/login",
+    status_code=status.HTTP_200_OK,
+    response_model=Token,
+    responses={
+        200: {"description": "Successful Response."},
+        400: {"description": "Bad Request: Invalid credentials."},
+        403: {"description": "Forbidden: Wrong credetials or user is not active, not verified or is blocked."},
+        500: {"description": "Internal Server Error."},
+    },
+)
+def post_login(credentials: AuthRequest) -> Token:
+    """
+    Post Login.
+
+    Will return a JWT token if the user credentials are valid and the user is:
+    - Verified
+    - Active
+    - Not Blocked
+    """
+    return authenticate(credentials=credentials)
 
 
-# @router.get("/logout", status_code=status.HTTP_302_FOUND)
-# def logout(req: Request, who: UserOut = Depends(authenticate)) -> JSONResponse:
-#     """Logout endpoint for the API."""
-#     if who is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Not authorized: Bad credentials.",
-#         )
-#     if req.cookies.get("Authorization"):
-#         jwt_factory.revoke(req.cookies["Authorization"])
-#     if req.headers.get("Authorization"):
-#         jwt_factory.revoke(req.headers["Authorization"])
-#     resp = JSONResponse(
-#         content=SimpleMessage(status="Sucessfully logged out.").json(),
-#         status_code=status.HTTP_302_FOUND,
-#     )
-#     resp.delete_cookie("Authorization")
-#     resp.headers["Authorization"] = ""
-#     return resp
+@router.get("/validate", status_code=status.HTTP_200_OK, response_model=SimpleMessage)
+def get_validate(token: Annotated[str, Depends(barear)]):
+    """Get Validate."""
+    if token:
+        return SimpleMessage(status="Token is valid.")
 
 
-# @router.get("/validate", status_code=status.HTTP_200_OK, response_model=UserOut)
+@router.get("/renew", status_code=status.HTTP_200_OK, response_model=Token)
+def get_renew(token: Annotated[str, Depends(barear)]):
+    """Get Renew."""
+    new_token = renew(token=Token(access_token=token))
+    revoke(token=Token(access_token=token))
+    return new_token
+
+
+@router.get("/logout", status_code=status.HTTP_200_OK, response_model=SimpleMessage)
+def get_logout(token: Annotated[str, Depends(barear)]):
+    """Get Logout."""
+    revoke(token=Token(access_token=token))
+    return SimpleMessage(status="Logout successful.")

@@ -12,9 +12,21 @@ from api.core.healthcheck.schema import Entity, HealthCheck
 router = APIRouter()
 
 
-@router.get("/", response_model=HealthCheck, status_code=status.HTTP_200_OK)
+@router.get(
+    "/",
+    response_model=HealthCheck,
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Healthcheck"},
+        500: {"description": "Internal Server Error"},
+    },
+)
 def simple_healthcheck() -> HealthCheck:
-    """Do simple healthcheck endpoint for load balancers."""
+    """
+    Get Healthcheck.
+
+    Do simple healthcheck endpoint for load balancers.
+    """
     # Check Database
     with session() as dabase_session:
         lstart = datetime.now()

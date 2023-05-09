@@ -20,7 +20,7 @@ class Token(BaseModel):
     """JWT Token Model."""
 
     access_token: str
-    token_type: str
+    token_type: str = "bearer"
 
 
 class RevokedToken(BaseModel):
@@ -38,7 +38,7 @@ class RevokedToken(BaseModel):
 class JWTFactory(BaseModel, Singleton):
     """JWT Factory."""
 
-    def __parce(self, token: str):
+    def parce(self, token: str):
         """Parce a JWT, and return the payload as a dict."""
         try:
             data = jwt.decode(
@@ -53,27 +53,19 @@ class JWTFactory(BaseModel, Singleton):
             ) from error
         return data
 
-    def __check_revoked(self, token: str) -> bool:
+    def check_revoked(self, token: str) -> bool:
         """Check if token is revoked."""
-        data = self.__parce(token)
+        data = self.parce(token)
+        revoked = RevokedToken(token=token, expiration=datetime.utcfromtimestamp(data["exp"]))
         if running_settings.jwt.jwt_revokes_store == "memory":
-            if (
-                RevokedToken(
-                    token=token, expiration=datetime.utcfromtimestamp(float(data["exp"]))
-                )
-                in bad_tokens
-            ):
+            if revoked in bad_tokens:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Not authorized: Invalid token.",
                 )
         if running_settings.jwt.jwt_revokes_store == "database":
             with session() as database_session:
-                if (
-                    database_session.query(RevokedTokenORM)
-                    .filter(RevokedTokenORM.token == token)
-                    .first()
-                ):
+                if database_session.query(RevokedTokenORM).filter(RevokedTokenORM.token == token).first():
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Not authorized: Invalid token.",
@@ -82,26 +74,24 @@ class JWTFactory(BaseModel, Singleton):
             raise NotImplementedError
         return True
 
-    def create(self, email: str) -> Token:
+    def create(self, email: str) -> str:
         """Generate JWT."""
-        token = str(
+        return str(
             jwt.encode(
                 {
                     "sub": email,
                     "iat": datetime.utcnow(),
-                    "exp": datetime.utcnow()
-                    + timedelta(minutes=running_settings.jwt.jwt_expiration_initial),
+                    "exp": datetime.utcnow() + timedelta(minutes=running_settings.jwt.jwt_expiration_initial),
                 },
                 key=environment.jwt_key,
                 algorithm=running_settings.jwt.jwt_algorithm,
             )
         )
-        return Token(access_token=token, token_type="bearer")
 
     def verify(self, token: str) -> str:
         """Verify JWT."""
         # Is it a Valit Token?
-        data = self.__parce(token)
+        data = self.parce(token)
         # Is it expired?
         if datetime.utcfromtimestamp(float(data["exp"])) < datetime.utcnow():
             raise HTTPException(
@@ -121,7 +111,7 @@ class JWTFactory(BaseModel, Singleton):
                 detail="Not authorized: Invalid token.",
             )
         # Is ir revoked?
-        self.__check_revoked(token)
+        self.check_revoked(token)
         return str(data["sub"])
 
     def revoke(self, token: str) -> bool:
@@ -130,59 +120,43 @@ class JWTFactory(BaseModel, Singleton):
         if token.startswith("Bearer "):
             token = token.split(" ")[1]
             # Is it a Valit Tokern?
-        data = self.__parce(token)
+        data = self.parce(token)
         # Add to bad tokens
-        if self.__check_revoked(token):
+        revoked = RevokedToken(token=token, expiration=datetime.utcfromtimestamp(data["exp"]))
+        if self.check_revoked(token):
             if running_settings.jwt.jwt_revokes_store == "memory":
-                bad_tokens.append(
-                    RevokedToken(
-                        token=token, expiration=datetime.utcfromtimestamp(data["exp"])
-                    )
-                )
+                bad_tokens.append(revoked)
             if running_settings.jwt.jwt_revokes_store == "database":
                 with session() as database_session:
-                    if (
-                        database_session.query(RevokedTokenORM)
-                        .filter(RevokedTokenORM.token == token)
-                        .first()
-                        is None
-                    ):
-                        database_session.add(
-                            RevokedTokenORM(
-                                token=token,
-                                expiration=datetime.utcfromtimestamp(data["exp"]),
-                            )
-                        )
+                    if database_session.query(RevokedTokenORM).filter(RevokedTokenORM.token == token).first() is None:
+                        database_session.add(revoked)
                         database_session.commit()
             if running_settings.jwt.jwt_revokes_store == "cache":
                 raise NotImplementedError
         return True
 
-    def renew(self, token: str):
+    def renew(self, token: str) -> str:
         """Renew JWT."""
         # Fix Format
-        if token.startswith("Bearer "):
+        if token.startswith("Bearer ") or token.startswith("bearer "):
             token = token.split(" ")[1]
-        # Check if token is valid
-        data = self.__parce(token)
+        data = self.parce(token)
         # Calculate new expiration
         old_expiration = datetime.utcfromtimestamp(float(data["exp"]))
-        new_expiration = old_expiration + timedelta(
-            minutes=running_settings.jwt.jwt_expiration_step
-        )
-        max_expiration = datetime.utcnow() + timedelta(
-            minutes=running_settings.jwt.jwt_expiration_max
-        )
+        new_expiration = old_expiration + timedelta(minutes=running_settings.jwt.jwt_expiration_step)
+        max_expiration = datetime.utcnow() + timedelta(minutes=running_settings.jwt.jwt_expiration_max)
         new_expiration = min(new_expiration, max_expiration)
         # Renew token
-        return jwt.encode(
-            {
-                "sub": data["sub"],
-                "iat": data["iat"],
-                "exp": new_expiration.utcnow(),
-            },
-            key=environment.jwt_key,
-            algorithm=running_settings.jwt.jwt_algorithm,
+        return str(
+            jwt.encode(
+                {
+                    "sub": data["sub"],
+                    "iat": data["iat"],
+                    "exp": new_expiration.utcnow(),
+                },
+                key=environment.jwt_key,
+                algorithm=running_settings.jwt.jwt_algorithm,
+            )
         )
 
 
@@ -192,7 +166,7 @@ class AuthRequest(BaseModel):
     username: str = Field(
         title="Username or Email",
         description="Username or Email, depending on the configuration.",
-        example="john.doe@email.com",
+        example="john.doe@example.com",
     )
     password: str = Field(title="Password", description="Password.", example="P@ssw0rd")
 

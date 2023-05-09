@@ -18,9 +18,7 @@ class QueryBase(BaseModel):
         records (int): Number of records to return.
     """
 
-    page: int = Query(
-        default=1, title="Page number", description="Page number to return.", gt=0
-    )
+    page: int = Query(default=1, title="Page number", description="Page number to return.", gt=0)
     records: int = Query(
         default=100,
         title="Records per page",

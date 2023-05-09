@@ -52,9 +52,7 @@ async def update_settings(settings_in: RunningSettings):
         setattr(RunningSettings(), item, value)
     if RunningSettings().save() is True:
         return RunningSettings()
-    raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-    )
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
 
 @router.get(
@@ -77,6 +75,4 @@ async def reset_settings():
     """
     if RunningSettings().reset() is True:
         return RunningSettings()
-    raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-    )
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")

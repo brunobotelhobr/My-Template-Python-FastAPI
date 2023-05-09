@@ -62,11 +62,7 @@ class RunningSettings(Settings, Singleton):
         """Save the configuration to the database."""
         with session() as database_session:
             # Query the database for the settings
-            settings_from_database = (
-                database_session.query(SettingsORM)
-                .filter(SettingsORM.name == "global")
-                .first()
-            )
+            settings_from_database = database_session.query(SettingsORM).filter(SettingsORM.name == "global").first()
             # If the settings exist, update them
             if not settings_from_database:
                 database_session.add(SettingsORM(name="global", data=str(self.json())))
@@ -82,11 +78,7 @@ class RunningSettings(Settings, Singleton):
         with session() as database_session:
             if environment.database_lazzy_loader:
                 return True
-            settings_from_database = (
-                database_session.query(SettingsORM)
-                .filter(SettingsORM.name == "global")
-                .first()
-            )
+            settings_from_database = database_session.query(SettingsORM).filter(SettingsORM.name == "global").first()
             if not settings_from_database:
                 return True
             loaded = json.loads(str(settings_from_database.data))
@@ -103,11 +95,7 @@ class RunningSettings(Settings, Singleton):
         """Reset the configuration from the database."""
         with session() as database_session:
             # Query the database for the settings
-            settings_from_database = (
-                database_session.query(SettingsORM)
-                .filter(SettingsORM.name == "global")
-                .first()
-            )
+            settings_from_database = database_session.query(SettingsORM).filter(SettingsORM.name == "global").first()
             # If the settings exist, update them
             new_data = str(Settings().json())
             if not settings_from_database:

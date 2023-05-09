@@ -1,13 +1,7 @@
 """User Router."""
 from fastapi import APIRouter, HTTPException, status
 
-from api.core.dependencies import (
-    Database,
-    Generator,
-    HashManager,
-    QueryParameters,
-    Settings,
-)
+from api.core.dependencies import Database, Generator, HashManager, QueryParameters, Settings
 from api.core.paginator.utils import executor
 from api.users.model import PageUserOut, UserBase, UserDB, UserIn, UserOut
 from api.users.orm import UserORM
@@ -31,12 +25,6 @@ def get_users(
     Get all users.
 
     This method return a list of all users, paginated according to the query parameters.
-
-    Args:
-        query (QueryParameters): Query parameters.
-
-    Returns:
-        PageUserOut: Paginated list of users.
     """
     return executor(orm=UserORM, query=query, schema=UserDB)  # type: ignore[arg-type]
     # MyPy is not recognizing herance from PageBase
@@ -57,12 +45,6 @@ def get_user(key: str, database: Database):
     Get a user.
 
     This method return details of a idenfied user by the user's key.
-
-    Args:
-        key (str): User's key.
-
-    Returns:
-        UserOut: User details.
     """
     # Check if user exists.
     user_from_database = database.query(UserORM).filter(UserORM.key == key).first()
@@ -82,19 +64,11 @@ def get_user(key: str, database: Database):
         500: {"description": "Internal Server Error."},
     },
 )
-def create_user(
-    user_in: UserIn, database: Database, generator: Generator, hash_handler: HashManager
-):
+def create_user(user_in: UserIn, database: Database, generator: Generator, hash_handler: HashManager):
     """
     Post a user.
 
     This method create a new user.
-
-    Args:
-        user_in (UserIn): User data.
-
-    Returns:
-        UserOut: User details.
     """
     # Check if a user with the same email exists.
     user_in_db = database.query(UserORM).filter(UserORM.email == user_in.email).first()
@@ -104,9 +78,7 @@ def create_user(
             detail="Not processed: Email already exists.",
         )
     # Check if a user with the same username exists.
-    user_in_db = (
-        database.query(UserORM).filter(UserORM.username == user_in.username).first()
-    )
+    user_in_db = database.query(UserORM).filter(UserORM.username == user_in.username).first()
     if user_in_db is not None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -138,12 +110,6 @@ def update_user(user_in: UserBase, key: str, database: Database):
     Update a user.
 
     This method update a user.
-
-    Args:
-        user_in (UserBase): User data.
-
-    Returns:
-        UserOut: User details.
     """
     # Check if user exists.
     user_from_database = database.query(UserORM).filter(UserORM.key == key).first()
@@ -173,12 +139,6 @@ def delete_user(key: str, database: Database, settings: Settings):
 
     This method delete a user.
     If the user deletion is not allowed on application settings, a 422 status code is returned.
-
-    Args:
-        key (str): User's key.
-
-    Returns:
-        UserOut: User details.
     """
     # Check if user deletion is allowed.
     if settings.users.allow_delete is False:

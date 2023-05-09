@@ -85,9 +85,7 @@ class RandomGenerator(Singleton):
             )
         # check if the numbers, special, uper and lower are greater than or equal to zero
         if numbers < 0 or special < 0 or uper < 0 or lower < 0:
-            raise ValueError(
-                "The numbers, special, uper and lower must be greater than or equal to zero."
-            )
+            raise ValueError("The numbers, special, uper and lower must be greater than or equal to zero.")
 
         char_set = ""
         generated_password = ""
@@ -113,9 +111,7 @@ class RandomGenerator(Singleton):
             generated_password += random.choice(string.ascii_lowercase) * lower
 
         # add the remaining chars to password
-        generated_password += "".join(
-            random.sample(char_set, size - len(generated_password))
-        )
+        generated_password += "".join(random.sample(char_set, size - len(generated_password)))
 
         return str(generated_password)
 
@@ -132,9 +128,7 @@ class HashHandler(Singleton):
         return str(PasswordHasher().hash(password))  # pylint: disable=redefined-builtin
         # PyLint W0622: Redefining built-in 'hash' (redefined-builtin)
 
-    def verify_hash(
-        self, password: str, hash: str  # pylint: disable=redefined-builtin
-    ) -> bool:
+    def verify_hash(self, password: str, hash: str) -> bool:  # pylint: disable=redefined-builtin
         # PyLint W0622: Redefining built-in 'hash' (redefined-builtin)
         """Verify if the hash is valid."""
         try:

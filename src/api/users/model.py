@@ -37,15 +37,11 @@ class Password(BaseModel):
 
             if min_upper > 0:
                 if sum(1 for caracter in value if caracter.isupper()) < min_upper:
-                    raise ValueError(
-                        f"Password must have at least {min_upper} uppercase letters"
-                    )
+                    raise ValueError(f"Password must have at least {min_upper} uppercase letters")
 
             if min_lower > 0:
                 if sum(1 for caracter in value if caracter.islower()) < min_lower:
-                    raise ValueError(
-                        f"Password must have at least {min_lower} lowercase letters"
-                    )
+                    raise ValueError(f"Password must have at least {min_lower} lowercase letters")
 
             if min_digits > 0:
                 if sum(1 for caracter in value if caracter.isdigit()) < min_digits:
@@ -53,9 +49,7 @@ class Password(BaseModel):
 
             if min_special > 0:
                 if sum(1 for caracter in value if not caracter.isalnum()) < min_special:
-                    raise ValueError(
-                        f"Password must have at least {min_special} special characters"
-                    )
+                    raise ValueError(f"Password must have at least {min_special} special characters")
         return value
 
     class Config:
@@ -79,8 +73,7 @@ class UserBase(BaseModel):
         example="John Doe",
         title="Full name",
         description=(
-            "User full name, it must contain a space character, bigger than 5 and smaller "
-            "than 128 characters."
+            "User full name, it must contain a space character, bigger than 5 and smaller " "than 128 characters."
         ),
     )
     email: EmailStr = Field(
@@ -135,15 +128,9 @@ class UserOut(UserBase):
         description="User key, it is a unique identifier.",
     )
     active: bool = Field(example=True, title="Active", description="User active status.")
-    blocked: bool = Field(
-        example=False, title="Blocked", description="User blocked status."
-    )
-    verified: bool = Field(
-        example=False, title="Verified", description="User verified status."
-    )
-    password_strikes: int = Field(
-        example=0, title="Password Strikes", description="User password strikes."
-    )
+    blocked: bool = Field(example=False, title="Blocked", description="User blocked status.")
+    verified: bool = Field(example=False, title="Verified", description="User verified status.")
+    password_strikes: int = Field(example=0, title="Password Strikes", description="User password strikes.")
     password_birthday: datetime = Field(
         example="2021-01-01 00:00:00",
         title="Password Setting Date",

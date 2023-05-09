@@ -9,9 +9,7 @@ from api.core.model import Singleton
 class JWTSettings(BaseModel):
     """JWT Settings."""
 
-    jwt_algorithm: str = Field(
-        title="JWT algorithm", description="JWT algorithm", default="HS256"
-    )
+    jwt_algorithm: str = Field(title="JWT algorithm", description="JWT algorithm", default="HS256")
     jwt_expiration_initial: int = Field(
         title="JWT initial expiration in minutes",
         description="Initial duration for a JWT",
@@ -46,16 +44,9 @@ class JWTSettings(BaseModel):
         if values["jwt_expiration_max"] < 1:
             raise ValueError("JWT expiration max must be greater than 0.")
         if values["jwt_expiration_initial"] > values["jwt_expiration_max"]:
-            raise ValueError(
-                "JWT expiration initial must be less than JWT expiration max."
-            )
-        if (
-            values["jwt_expiration_step"] + values["jwt_expiration_initial"]
-            > values["jwt_expiration_max"]
-        ):
-            raise ValueError(
-                "JWT expiration step plus JWT expiration initial must be less than JWT expiration max."
-            )
+            raise ValueError("JWT expiration initial must be less than JWT expiration max.")
+        if values["jwt_expiration_step"] + values["jwt_expiration_initial"] > values["jwt_expiration_max"]:
+            raise ValueError("JWT expiration step plus JWT expiration initial must be less than JWT expiration max.")
         return values
 
     class Config:  # pylint: disable=too-few-public-methods

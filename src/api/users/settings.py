@@ -61,10 +61,7 @@ class PasswordPolicy(BaseModel):
         if properties["min_length"] > properties["max_length"]:
             raise ValueError("min_length must be less than or equal to max_length")
         if (
-            properties["min_upper"]
-            + properties["min_lower"]
-            + properties["min_digits"]
-            + properties["min_special"]
+            properties["min_upper"] + properties["min_lower"] + properties["min_digits"] + properties["min_special"]
         ) > properties["min_length"]:
             raise ValueError(
                 "min_length must be more or equal to the sum of min_upper, min_lower, min_digits and min_special"
@@ -146,13 +143,8 @@ class UserSettings(BaseModel):
             raise ValueError("password_strikes must be greater than or equal to 1")
         if properties["password_strikes"] > 128:
             raise ValueError("password_strikes must be less than or equal to 128")
-        if (
-            properties["allow_login_with_email"] is False
-            and properties["allow_login_with_username"] is False
-        ):
-            raise ValueError(
-                "allow_login_with_email and allow_login_with_username can't be both False"
-            )
+        if properties["allow_login_with_email"] is False and properties["allow_login_with_username"] is False:
+            raise ValueError("allow_login_with_email and allow_login_with_username can't be both False")
         return properties
 
     class Config:
