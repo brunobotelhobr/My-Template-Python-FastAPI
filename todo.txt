@@ -53,3 +53,14 @@ user and email awnays in lowercases
 
 [00:37, 08/05/2023] Bruno Botelho: Puthon -i App.py (interativo)
 [00:37, 08/05/2023] Bruno Botelho: Devugger va code
+
+
+
+    PassLib is a great [[Python]] package to handle password hashes.
+    It supports many secure hashing algorithms and utilities to work with them.
+    The recommended algorithm is "[[Bcrypt]]".
+    So, install PassLib with [[Bcrypt]]:
+
+    pip install passlib[bycrypt]
+
+    --> Tem OTP tbm.

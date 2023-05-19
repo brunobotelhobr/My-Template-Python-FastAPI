@@ -51,6 +51,7 @@ pylint-pytest = "^1.1.2"
 sqlalchemy = {extras = ["mypy"], version = "^2.0.12"}
 flake8-print = "^5.0.0"
 ipdb = "^0.13.13"
+web-pdb = "^1.6.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.1.6"
